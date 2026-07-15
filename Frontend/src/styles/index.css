@@ -1,0 +1,174 @@
+@import 'pretendard/dist/web/static/pretendard.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 🎨 컬러 변수 설정 */
+  --bg: #F8FAFC;
+  /* 기본 배경색 */
+  --text: #0F172A;
+  /* 기본 텍스트 컬러 (본문, 소제목 공통) */
+  --text-h: #1E293B;
+  /* 메인 타이틀 컬러 (대제목 전용) */
+  --accent: #00D4B2;
+  /* UI 강조 키컬러 (민트) */
+  --accent-bg: rgba(0, 212, 178, 0.1);
+  --accent-border: rgba(0, 212, 178, 0.5);
+
+  --primary-btn: #6366F1;
+  /* 펀딩 버튼 등 주요 버튼 컬러 (인디고) */
+  --btn-text: #F8FAFC;
+  /* 버튼에 들어가는 텍스트 컬러 */
+  --warning: #FF6584;
+  /* 경고 및 마감 임박 컬러 */
+
+  /* 보조 UI 변수 */
+  --border: #E2E8F0;
+  --code-bg: #F1F5F9;
+  --social-bg: rgba(241, 245, 249, 0.5);
+  --shadow:
+    rgba(15, 23, 42, 0.08) 0 10px 15px -3px, rgba(15, 23, 42, 0.04) 0 4px 6px -2px;
+
+  /* 폰트 정의 (Pretendard 최우선) */
+  --sans: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  /* 본문 기본값: Regular(400) */
+  font: 400 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+/* 시스템 다크모드 대응 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0F172A;
+    --text: #E2E8F0;
+    --text-h: #F8FAFC;
+    --border: #334155;
+    --code-bg: #1E293B;
+    --accent: #34E0C5;
+    --accent-bg: rgba(52, 224, 197, 0.15);
+    --accent-border: rgba(52, 224, 197, 0.5);
+    --social-bg: rgba(30, 41, 59, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  font-weight: 400;
+  /* 본문 기본 Regular(400) 보장 */
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  border-inline: 1px solid var(--border);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: var(--bg);
+}
+
+/* 1. 대제목 (Page Title) */
+h1 {
+  font-family: var(--heading);
+  font-weight: 700;
+  /* Bold (700) */
+  color: var(--text-h);
+  /* 메인 타이틀 컬러 */
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+
+/* 2. 소제목 (Section Title) */
+h2 {
+  font-family: var(--heading);
+  font-weight: 600;
+  /* SemiBold (600) */
+  color: var(--text);
+  /* 본문과 동일한 색상 */
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+
+/* 3. 본문 텍스트 */
+p {
+  margin: 0;
+  font-weight: 400;
+  /* Regular (400) */
+  color: var(--text);
+}
+
+/* 4. 경고 및 마감 임박 메시지용 공통 클래스 */
+.text-warning {
+  color: var(--warning);
+  font-weight: 600;
+  /* SemiBold (600) */
+}
+
+/* 5. 펀딩 및 핵심 버튼 공통 컴포넌트 클래스 */
+.btn-primary {
+  background-color: var(--primary-btn);
+  color: var(--btn-text);
+  /* #F8FAFC */
+  font-weight: 700;
+  /* Bold (700) */
+  border-radius: 6px;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* 코드 스타일 */
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
