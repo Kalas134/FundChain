@@ -1,9 +1,9 @@
 import React from 'react';
 
-function HomePage(props) {
+function HomePage() {
     return (
         <div>
-            
+            <h1>홈 화면입니다.</h1>
         </div>
     );
 }

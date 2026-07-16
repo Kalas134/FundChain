@@ -1,0 +1,17 @@
+.header {
+    display: flex;
+    align-items: center;
+}
+
+.header_left {
+    align-items: left;
+}
+
+.header_search {
+    flex: 1;
+}
+
+.header_right1,
+.header_right2 {
+    margin-left: 20px;
+}
