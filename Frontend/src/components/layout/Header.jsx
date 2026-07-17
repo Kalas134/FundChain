@@ -21,7 +21,7 @@ function Header() {
                 <Link>{/* 프로젝트 올리는 링크 */}</Link>
             </div>
             <div className="header_right2">
-                <Link to="/login">로그인/회원가입</Link>
+                <p><Link to="/login">로그인/회원가입</Link></p>
             </div>
         </header>
     );
