@@ -29,3 +29,26 @@
     box-shadow: 0 4px 4px -4px rgba(0, 0, 0, 0.3);
     font-size: 25px;
 }
+
+.loginBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.loginForm > input {
+    border: 1px solid black;
+    width: 250px;
+}
+
+.loginForm > .registryAndPwUpdate {
+    margin-top: 8px;
+    flex-direction: row;
+}
