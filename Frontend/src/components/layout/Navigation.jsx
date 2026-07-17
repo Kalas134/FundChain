@@ -1,10 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Navigation() {
     return (
-        <>
-        <h1>메뉴바들어갈 자리</h1>
-        </>
+        <div className="navigation">
+            <Link to={"/"}>홈</Link>{" | "}
+            <Link to={"/AboutPage"}>소개</Link>{" | "}
+            <Link to={"#"}>프로젝트</Link>{" | "}
+        </div>
     );
 }
 
