@@ -3,15 +3,16 @@ SELECT current_database();
 -- User table
 
 create table Users (
-	USERCREATER BOOLEAN, -- True: user // False: Creater
 	USERID varchar(10),
-	NICKNAME varchar(20) not null,
-	PASSWORD varchar(30) not null,
-	USERNAME varchar(20) not  null,
-	BIRYHDATE DATE not null,
-	PHONENUM varchar(10) not null,
-	EMAIL varchar(10) not null,
-	ACCOUNTNUM varchar(25),
+    USER_ROLE varchar(20), -- User Creator admin
+    PASSWORD varchar(100) not null,
+	NICKNAME varchar(30) unique not null,
+	USERNAME varchar(30) not null,
+	BIRTHDATE DATE not null,
+	PHONE_NUM varchar(20) not null,
+	EMAIL varchar(100) not null,
+    BANK_NAME varchar(30),
+	ACCOUNT_NUM varchar(25),
 	-- 전부 임시임 회의 필요
 	primary key (USERCREATER, USERID)
 );
