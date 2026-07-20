@@ -2,8 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import AppLayout from "../components/layout/AppLayout";
 import Common_UIRouter from "./Common_UIRouter";
 import AuthRouter from "./AuthRouter";
+import MyPageRouter from "./MyPageRouter";
 // import ProjectRouter from "./ProjectRouter";
-// import MyPageRouter from "./MyPageRouter";
 
 function AppRouter() {
     return (
@@ -11,8 +11,8 @@ function AppRouter() {
             <Route path="/" element={<AppLayout />} >
                 {Common_UIRouter}
                 {AuthRouter}
+                {MyPageRouter}
                 {/* {ProjectRouter} */}
-                {/* {MyPageRouter} */}
             </Route>
         </Routes>
     );
