@@ -1,9 +1,11 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import LoginForm from '../components/LoginForm';
 
 function LoginPage() {
     return (
-        <div>
-            <p>로그인 페이지</p>
+        <div className="loginPage">
+            <LoginForm />
         </div>
     );
 }
