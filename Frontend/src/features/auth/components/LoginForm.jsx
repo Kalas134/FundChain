@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 import LoginPage from '../pages/LoginPage';
 
 function LoginForm() {
@@ -18,14 +19,14 @@ function LoginForm() {
                 </div>
                 <div className="UserRule">
                     일반 사용자{" : "}<input
-                    type="radio" name="UserRule" value="User" />
+                    type="radio" name="UserRule" value="User" />{" | "}
                     크리에이터{" : "}<input
                     type="radio" name="UserRule" value="Creator" />
                 </div>
             </form>
             <div className="registryAndPwUpdate">
                 <Link to="/Resistry">회원가입</Link>{" | "}
-                {/* <Link to="/PwUpdate">비밀번호 수정</Link> */}
+                <Link to="/PwUpdate">비밀번호 수정</Link>
             </div>
         </div>
     );
