@@ -3,6 +3,7 @@ import AppLayout from "./components/layout/AppLayout";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./features/auth/pages/LoginPage";
+import RegisterPage from "./features/auth/pages/RegisterPage";
 import "./styles/index.css";
 import "./styles/image.css";
 import "./styles/frame.css";
