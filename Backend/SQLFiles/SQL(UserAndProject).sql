@@ -14,5 +14,5 @@ create table Users (
     BANK_NAME varchar(30),
 	ACCOUNT_NUM varchar(25),
 	-- 전부 임시임 회의 필요
-	primary key (USERCREATER, USERID)
+	primary key (USER_ROLE, USERID)
 );
