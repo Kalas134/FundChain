@@ -1,4 +1,4 @@
-package com.fundchain.service;
+package com.fundchain.hashchain;
 
 import com.fundchain.entity.TransactionLedger;
 import com.fundchain.repository.TransactionLedgerRepository;
@@ -10,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import com.fundchain.hashchain.dto.HashChainVerifyResponseDto;
 
 /**
  * 해시 체인 기반 거래 내역 비즈니스 로직 서비스
@@ -65,13 +67,14 @@ public class HashChainService {
      * 저장된 모든 거래 데이터를 ID 순서대로 순회하며,
      * 각 레코드의 데이터로 재계산한 해시값 검증 및 블록 간 체인 연결 고리(이전 해시 링크) 검증을 수행합니다.
      *
-     * @return 검증 성공(무결성 보장) 시 true, 데이터 위변조 또는 체인 이탈 감지 시 false
+     * @return 무결성 검증 결과 DTO (HashChainVerifyResponseDto)
      */
-    public boolean verifyChain() {
+    public HashChainVerifyResponseDto verifyChain() {
         // DB에 기록된 모든 거래 데이터를 정렬(ID순)해서 가져옴
         List<TransactionLedger> chain = ledgerRepository.findAll();
+        int totalCount = chain.size();
 
-        for (int i = 0; i < chain.size(); i++) {
+        for (int i = 0; i < totalCount; i++) {
             TransactionLedger current = chain.get(i);
 
             // 검증 A: 현재 장부의 데이터를 가지고 새로 계산한 해시가 저장된 해시와 일치하는가?
@@ -79,20 +82,26 @@ public class HashChainService {
             String calculatedHash = calculateSha256(dataToHash);
 
             if (!current.getCurrentHash().equals(calculatedHash)) {
-                System.out.println("❌ 위변조 감지! [ID: " + current.getId() + "]의 데이터 혹은 현재 해시가 조작되었습니다.");
-                return false;
+                return HashChainVerifyResponseDto.fail(
+                        totalCount,
+                        current.getId(),
+                        "해시값 불일치 (데이터 변조 감지)"
+                );
             }
 
             // 검증 B: 두 번째 블록부터는 '이전 블록의 현재 해시'와 '현재 블록의 이전 해시'가 일치하는가?
             if (i > 0) {
                 TransactionLedger previous = chain.get(i - 1);
                 if (!current.getPreviousHash().equals(previous.getCurrentHash())) {
-                    System.out.println("❌ 위변조 감지! [ID: " + current.getId() + "]의 연결 고리(이전 해시 링크)가 깨졌습니다.");
-                    return false;
+                    return HashChainVerifyResponseDto.fail(
+                            totalCount,
+                            current.getId(),
+                            "체인 고리(이전 해시 링크) 끊김 감지"
+                    );
                 }
             }
         }
-        return true;
+        return HashChainVerifyResponseDto.success(totalCount);
     }
 
     /**

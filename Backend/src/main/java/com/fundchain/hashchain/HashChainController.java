@@ -1,11 +1,12 @@
-package com.fundchain.controller;
+package com.fundchain.hashchain;
 
-import com.fundchain.service.HashChainService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.fundchain.hashchain.dto.HashChainVerifyResponseDto;
 
 /**
  * 거래 해시 체인 관리 REST 컨트롤러
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/transactions")
 @RequiredArgsConstructor
-public class HashChainServiceController {
+public class HashChainController {
 
     private final HashChainService hashChainService;
 
@@ -44,17 +45,12 @@ public class HashChainServiceController {
      * <p>
      * DB에 기록된 해시 체인의 모든 거래 데이터와 링크가 위변조되지 않았는지 검증합니다.
      *
-     * @return 검증 성공 시 200 OK, 위변조 감지 시 500 Internal Server Error 응답
+     * @return 무결성 검증 결과 DTO 응답
      */
     @Operation(summary = "전체 거래 내역 Hash 검증", description = "DB에 기록된 해시 체인이 변조되지 않았는지 검증합니다.")
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyHashChain() {
-        boolean isValid = hashChainService.verifyChain();
-
-        if (isValid) {
-            return ResponseEntity.ok("✅ 거래 내역 검증 완료: 모든 거래 데이터의 무결성이 보장된 상태입니다.");
-        } else {
-            return ResponseEntity.status(500).body("🚨 거래 내역 위변조 경고: 데이터 정합성이 깨졌습니다. 즉시 확인이 필요합니다.");
-        }
+    public ResponseEntity<HashChainVerifyResponseDto> verifyHashChain() {
+        HashChainVerifyResponseDto result = hashChainService.verifyChain();
+        return ResponseEntity.ok(result);
     }
 }
