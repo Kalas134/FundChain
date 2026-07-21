@@ -14,3 +14,5 @@ create table Users (
     BANK_NAME varchar(30) not null,
 	ACCOUNT_NUM varchar(25) not null
 );
+
+drop table Users;
