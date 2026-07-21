@@ -4,11 +4,21 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
 
+    // 암호화 관련 Bean 세팅 (현재 세팅만 해놓고 아직 사용은 안함)
+    @Bean
+    public PasswordEncoder passwordEncoder(
+            SHA256PasswordEncoder encoder
+    ) {
+        return encoder;
+    }
+
+    // 필터체인 관련
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
