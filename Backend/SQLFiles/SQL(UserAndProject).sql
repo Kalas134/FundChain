@@ -1,55 +1,29 @@
 SELECT current_database();
 
--- User table
+DROP TABLE IF EXISTS Users;
 
-create table Users (
-	USERID varchar(10) PRIMARY KEY,
-    USER_ROLE varchar(20) not null, -- User Creator admin
-    PASSWORD varchar(100) not null,
-	NICKNAME varchar(30) unique not null,
-	USERNAME varchar(30) not null,
-	BIRTHDATE DATE not null,
-	PHONE_NUM varchar(20) not null,
-	EMAIL varchar(100) not null,
-    BANK_NAME varchar(30) not null,
-	ACCOUNT_NUM varchar(25) not null
-);
 
-create table Projects (
-    PROJECT_ID BIGSERIAL PRIMARY KEY,
+CREATE TABLE Users (
+    USER_ID VARCHAR(50) PRIMARY KEY,
 
-    CREATOR_ID varchar(10) not null, --USER_ROLE : Creator에만 해당되는 사람들
+    USER_ROLE VARCHAR(20) NOT NULL
+        CHECK (USER_ROLE IN ('USER', 'CREATOR', 'ADMIN')),
 
-    TITLE varchar(100) not null,
-    SHORT_DESC varchar(200) not null,
+    PASSWORD VARCHAR(100) NOT NULL,
 
-    TARGET_AMOUNT BIGINT not null,
+    NICKNAME VARCHAR(30) NOT NULL UNIQUE,
 
-    START_DATE date not null,
-    END_DATE date not null,
+    USERNAME VARCHAR(50) NOT NULL,
 
-    PROJECT_STATUS varchar(20) not null,
+    BIRTHDATE DATE NOT NULL,
 
-    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PHONE_NUM VARCHAR(20) NOT NULL UNIQUE,
 
-    CONSTRAINT Fk_Projects_Users
-        FOREIGN KEY (CREATOR_ID)
-        REFERENCES Users(USERID)
-);
+    EMAIL VARCHAR(100) NOT NULL UNIQUE,
 
-create table ProjectContent (
-    CONTENT_ID BIGSERIAL PRIMARY KEY,
+    BANK_NAME VARCHAR(30),
 
-    PROJECT_ID BIGINT not null,
+    ACCOUNT_NUM VARCHAR(25),
 
-    CONTENT TEXT not null,
-
-    IMAGE_URL varchar(255),
-
-    CREATED_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT Fk_ProjectContent_Projects
-        FOREIGN KEY (PROJECT_ID)
-        REFERENCES Projects(PROJECT_ID)
-        ON DELETE CASCADE
+    IS_DELETED BOOLEAN NOT NULL DEFAULT FALSE
 );
