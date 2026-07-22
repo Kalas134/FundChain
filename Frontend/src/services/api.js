@@ -1,6 +1,6 @@
 // src/services/api.js
 import axios from 'axios';
-import { useAuthStore } from '../store/useAuthStore'; // Zustand 스토어 경로
+// import { useAuthStore } from '../store/useAuthStore'; // Zustand 스토어 경로
 
 // 1. Axios 인스턴스 생성
 const api = axios.create({
@@ -9,7 +9,7 @@ const api = axios.create({
         'Content-Type': 'application/json',
     },
 });
-
+/*
 // 2. Request Interceptor (요청 가로채기)
 // 백엔드로 요청을 보내기 직전에 로그인 토큰(JWT)이 있다면 Header에 자동으로 끼워 넣습니다.
 api.interceptors.request.use(
@@ -46,5 +46,5 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
+*/
 export default api;
