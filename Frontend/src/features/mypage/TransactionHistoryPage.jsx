@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 /**
  * [DB Schema 참고]
  * 1. Users: USER_ID, USER_ROLE, NICKNAME, USERNAME, BIRTHDATE, PHONE_NUM, EMAIL, BANK_NAME, ACCOUNT_NUM
- * 2. Projects: PROJECT_ID, CREATOR_ID, TITLE, THUMBNAIL_IMAGE, TARGET_AMOUNT, START_DATE, END_DATE, STATUS ('PREPARING', 'ONGOING', 'SUCCESS', 'FAILED')
+ * 2. Projects: PROJECT_ID, CREATOR_ID, TITLE, THUMBNAIL_IMAGE, TARGET_AMOUNT, START_DATE, END_DATE, STATUS
  * 3. SupportHistory: SUPPORT_ID, PROJECT_ID, USER_ID, AMOUNT, SUPPORTED_AT
  */
 
@@ -14,19 +14,17 @@ const MOCK_TRANSACTION_HISTORY = [
         projectId: 1,
         userId: "user_dongguri",
         amount: 50000,
-        supportedAt: "2026-07-15T14:30:00",
-        // Projects 테이블 JOIN 정보
+        supportedAt: "2026-07-15",
         title: "친환경 블록체인 기반 자원 순환 펀딩 프로젝트",
         thumbnailImage: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&auto=format&fit=crop&q=80",
         targetAmount: 5000000,
         currentAmount: 6250000,
-        startDate: "2026-07-01T00:00:00",
-        endDate: "2026-08-01T23:59:59",
+        startDate: "2026-07-01",
+        endDate: "2026-08-01",
         status: "ONGOING",
-        // Users (Creator) 테이블 JOIN 정보
         creatorId: "creator_ecolife",
         creatorNickname: "에코라이프 Labs",
-        bankName: "신한은행",
+        bankName: "신한카드",
         accountNum: "110-123-456789"
     },
     {
@@ -34,17 +32,17 @@ const MOCK_TRANSACTION_HISTORY = [
         projectId: 2,
         userId: "user_dongguri",
         amount: 120000,
-        supportedAt: "2026-06-20T09:15:00",
+        supportedAt: "2026-06-20",
         title: "행운을 시험해 보세요! 누구든지 즐길 수 있는 <나나>",
         thumbnailImage: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=400&auto=format&fit=crop&q=80",
         targetAmount: 10000000,
         currentAmount: 15400000,
-        startDate: "2026-05-15T00:00:00",
-        endDate: "2026-06-18T23:59:59",
+        startDate: "2026-05-15",
+        endDate: "2026-06-18",
         status: "SUCCESS",
         creatorId: "creator_boardgames",
         creatorNickname: "동구리 보드게임즈",
-        bankName: "국민은행",
+        bankName: "KB국민카드",
         accountNum: "456-789-012345"
     },
     {
@@ -52,17 +50,17 @@ const MOCK_TRANSACTION_HISTORY = [
         projectId: 3,
         userId: "user_dongguri",
         amount: 30000,
-        supportedAt: "2026-05-04T18:45:00",
+        supportedAt: "2026-05-04",
         title: "독립 창작자를 위한 스마트 크라우드 펀딩 키트",
         thumbnailImage: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&auto=format&fit=crop&q=80",
         targetAmount: 20000000,
         currentAmount: 3400000,
-        startDate: "2026-04-01T00:00:00",
-        endDate: "2026-05-01T23:59:59",
+        startDate: "2026-04-01",
+        endDate: "2026-05-01",
         status: "FAILED",
         creatorId: "creator_smartkit",
         creatorNickname: "스마트킷 스튜디오",
-        bankName: "카카오뱅크",
+        bankName: "카카오페이",
         accountNum: "3333-01-234567"
     },
     {
@@ -70,17 +68,17 @@ const MOCK_TRANSACTION_HISTORY = [
         projectId: 4,
         userId: "user_dongguri",
         amount: 85000,
-        supportedAt: "2026-04-12T11:00:00",
+        supportedAt: "2026-04-12",
         title: "제로웨이스트 다회용 리사이클링 패브릭 가방",
         thumbnailImage: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&auto=format&fit=crop&q=80",
         targetAmount: 3000000,
         currentAmount: 4200000,
-        startDate: "2026-03-10T00:00:00",
-        endDate: "2026-04-10T23:59:59",
+        startDate: "2026-03-10",
+        endDate: "2026-04-10",
         status: "SUCCESS",
         creatorId: "creator_greenbag",
         creatorNickname: "그린어스 패브릭",
-        bankName: "하나은행",
+        bankName: "하나카드",
         accountNum: "987-654-321098"
     },
     {
@@ -88,82 +86,73 @@ const MOCK_TRANSACTION_HISTORY = [
         projectId: 5,
         userId: "user_dongguri",
         amount: 150000,
-        supportedAt: "2026-07-20T16:20:00",
+        supportedAt: "2026-07-20",
         title: "차세대 Web3 펀딩체인 스마트 컨트랙트 에디션",
         thumbnailImage: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&auto=format&fit=crop&q=80",
         targetAmount: 50000000,
         currentAmount: 12000000,
-        startDate: "2026-08-01T00:00:00",
-        endDate: "2026-09-01T23:59:59",
-        status: "PREPARING",
+        startDate: "2026-08-01",
+        endDate: "2026-09-01",
+        status: "ONGOING",
         creatorId: "creator_fundchain",
         creatorNickname: "FundChain 개발팀",
-        bankName: "우리은행",
+        bankName: "우리통장계좌",
         accountNum: "1002-987-654321"
     }
 ];
 
 /**
- * 프로젝트 상태별 스타일 뱃지 맵
+ * 결제 상태별 배지 설정
  */
 const STATUS_CONFIG = {
     ALL: { label: '전체', badgeClass: '' },
-    ONGOING: { label: '진행중', badgeClass: 'bg-emerald-50 text-emerald-600 border border-emerald-200' },
-    SUCCESS: { label: '펀딩 성공', badgeClass: 'bg-indigo-50 text-indigo-600 border border-indigo-200' },
-    FAILED: { label: '펀딩 무산', badgeClass: 'bg-rose-50 text-rose-600 border border-rose-200' },
-    PREPARING: { label: '준비중', badgeClass: 'bg-amber-50 text-amber-600 border border-amber-200' },
+    ONGOING: { label: '진행중', badgeClass: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+    SUCCESS: { label: '결제 완료', badgeClass: 'bg-blue-50 text-blue-700 border border-blue-200' },
+    FAILED: { label: '환불 완료', badgeClass: 'bg-rose-50 text-rose-700 border border-rose-200' },
 };
 
-/**
- * 숫자 통화(원) 포맷팅 헬퍼 함수
- * @param {number} val - 금액 숫자
- */
-const formatCurrency = (val) => {
-    return new Intl.NumberFormat('ko-KR').format(val || 0) + '원';
-};
+/** 통화 포맷팅 (원) */
+const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val || 0) + '원';
 
-/**
- * 날짜 포맷팅 헬퍼 함수
- * @param {string} dateStr - ISO 날짜 문자열
- */
+/** ISO 날짜 문자열 포맷팅 (년.월.일) */
 const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
-    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+};
+
+/** 날짜 그룹핑 전용 키 (YYYY.MM.DD (요일)) */
+const getDateGroupKey = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`;
 };
 
 /**
- * 마이페이지 - 후원/거래 내역 컴포넌트 (TransactionHistoryPage)
- * Users, Projects, SupportHistory DB 테이블 구조에 맞춘 UI 디자인
+ * 마이페이지 - 심플 거래/결제 내역 컴포넌트 (TransactionHistoryPage)
  */
 function TransactionHistoryPage() {
-    // 검색어 상태 (프로젝트 제목 또는 창작자 닉네임)
     const [searchTerm, setSearchTerm] = useState('');
-    // 상태 필터 탭 ('ALL', 'ONGOING', 'SUCCESS', 'FAILED', 'PREPARING')
     const [statusFilter, setStatusFilter] = useState('ALL');
-    // 정렬 방식 상태 ('LATEST', 'OLDEST', 'HIGH_AMOUNT', 'LOW_AMOUNT')
     const [sortBy, setSortBy] = useState('LATEST');
-    // 선택된 영수증 모달 데이터 상태
     const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-    // 1. 요약 통계 계산
+    // 요약 통계
     const stats = useMemo(() => {
         const totalAmount = MOCK_TRANSACTION_HISTORY.reduce((acc, curr) => acc + curr.amount, 0);
         const totalCount = MOCK_TRANSACTION_HISTORY.length;
-        const ongoingCount = MOCK_TRANSACTION_HISTORY.filter(item => item.status === 'ONGOING').length;
-        const successCount = MOCK_TRANSACTION_HISTORY.filter(item => item.status === 'SUCCESS').length;
+        const refundAmount = MOCK_TRANSACTION_HISTORY
+            .filter(item => item.status === 'FAILED')
+            .reduce((acc, curr) => acc + curr.amount, 0);
 
-        return { totalAmount, totalCount, ongoingCount, successCount };
+        return { totalAmount, totalCount, refundAmount };
     }, []);
 
-    // 2. 필터링 및 정렬 처리
+    // 필터링 및 정렬
     const filteredHistory = useMemo(() => {
         return MOCK_TRANSACTION_HISTORY.filter((item) => {
-            // 탭 필터링
-            if (statusFilter !== 'ALL' && item.status !== statusFilter) {
-                return false;
-            }
-            // 검색어 필터링 (프로젝트 제목 또는 창작자 닉네임)
+            if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
                 const matchTitle = item.title.toLowerCase().includes(term);
@@ -180,43 +169,71 @@ function TransactionHistoryPage() {
         });
     }, [searchTerm, statusFilter, sortBy]);
 
+    // 날짜별 그룹핑
+    const groupedHistory = useMemo(() => {
+        const groups = {};
+        filteredHistory.forEach((item) => {
+            const dateKey = getDateGroupKey(item.supportedAt);
+            if (!groups[dateKey]) groups[dateKey] = [];
+            groups[dateKey].push(item);
+        });
+        return groups;
+    }, [filteredHistory]);
+
     return (
-        <div className="w-full max-w-[1080px] mx-auto px-4 py-8 font-sans text-tcolor">
-            {/* 페이지 타이틀 */}
-            <div className="text-left mb-8">
-                <h1 className="text-3xl font-bold text-thcolor mb-2">후원 및 거래 내역</h1>
-                <p className="text-sm text-gray-500">
-                    회원님이 참여하신 펀딩 프로젝트의 후원 상세 내역(SupportHistory)을 확인하실 수 있습니다.
-                </p>
+        <div className="w-full max-w-[1000px] mx-auto px-4 py-8 font-sans text-gray-900">
+
+            {/* 1. 페이지 헤더 */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                <div className="text-left">
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">거래 및 결제 내역</h1>
+                    <p className="text-xs text-gray-500 mt-1">
+                        후원하신 프로젝트의 결제 완료 및 환불 처리 상세 명세입니다.
+                    </p>
+                </div>
+                <button
+                    onClick={() => window.print()}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 border border-gray-300 rounded-md text-xs text-gray-600 hover:bg-gray-50 transition-colors"
+                >
+                    <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    내역 인쇄
+                </button>
             </div>
 
-            {/* 1. 요약 통계 카운터 카드 영역 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm text-left">
-                    <p className="text-xs font-medium text-gray-400 mb-1">총 후원 금액</p>
-                    <p className="text-xl font-bold text-funding">{formatCurrency(stats.totalAmount)}</p>
+            {/* 2. 결제 내역 요약 카드 */}
+            <div className="bg-white text-tcolor rounded-2xl p-6 mb-8 shadow-md relative overflow-hidden text-left">
+                <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
+
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4 mb-4">
+                    <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
+                        <span className="text-xs text-tcolor font-medium">FundChain 후원 결제 요약</span>
+                        <span className="text-xs text-slate-500">|</span>
+                        <span className="text-xs text-tcolor">이동구 (user_dongguri)</span>
+                    </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm text-left">
-                    <p className="text-xs font-medium text-gray-400 mb-1">총 후원 건수</p>
-                    <p className="text-xl font-bold text-gray-800">{stats.totalCount}건</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm text-left">
-                    <p className="text-xs font-medium text-gray-400 mb-1">진행중 프로젝트</p>
-                    <p className="text-xl font-bold text-emerald-600">{stats.ongoingCount}건</p>
-                </div>
-
-                <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm text-left">
-                    <p className="text-xs font-medium text-gray-400 mb-1">펀딩 성공 프로젝트</p>
-                    <p className="text-xl font-bold text-indigo-600">{stats.successCount}건</p>
+                <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
+                    <div>
+                        <span className="text-xs text-tcolor block mb-1">총 누적 결제 금액</span>
+                        <span className="text-3xl font-extrabold text-black tracking-tight font-mono">
+                            {formatCurrency(stats.totalAmount)}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs text-tcolor pt-2 sm:pt-0">
+                        <span>총 <strong className="text-black font-semibold">{stats.totalCount}건</strong> 결제</span>
+                        <span>·</span>
+                        <span>환불 완료 <strong className="text-rose-400 font-semibold">+{formatCurrency(stats.refundAmount)}</strong></span>
+                    </div>
                 </div>
             </div>
 
-            {/* 2. 컨트롤 바 (상태 탭, 검색 및 정렬) */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                {/* 상태 필터 탭 */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+            {/* 3. 검색 & 필터 바 */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-6 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                {/* 상태 탭 (진행중, 결제 완료, 환불 완료) */}
+                <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
                     {Object.keys(STATUS_CONFIG).map((statusKey) => {
                         const isActive = statusFilter === statusKey;
                         const label = STATUS_CONFIG[statusKey].label;
@@ -224,9 +241,9 @@ function TransactionHistoryPage() {
                             <button
                                 key={statusKey}
                                 onClick={() => setStatusFilter(statusKey)}
-                                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
-                                        ? 'bg-funding text-white shadow-md'
-                                        : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${isActive
+                                    ? 'bg-white text-black shadow-sm border border-accent'
+                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
                                     }`}
                             >
                                 {label}
@@ -235,219 +252,182 @@ function TransactionHistoryPage() {
                     })}
                 </div>
 
-                {/* 검색창 & 정렬 선택 */}
+                {/* 검색창 & 정렬 */}
                 <div className="flex items-center gap-2">
-                    <div className="relative flex-1 md:w-64">
+                    <div className="relative flex-1 md:w-56">
                         <input
                             type="text"
-                            placeholder="프로젝트 / 창작자 검색..."
+                            placeholder="프로젝트 / 창작자 검색"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2 text-xs border border-gray-200 rounded-lg bg-white focus:outline-none focus:border-funding transition-colors"
+                            className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:outline-none focus:border-slate-800"
                         />
-                        <svg
-                            className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
+                        <svg className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
 
                     <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className="px-3 py-2 text-xs border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:border-funding cursor-pointer"
+                        className="px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg bg-white text-gray-700 focus:outline-none focus:border-slate-800 cursor-pointer"
                     >
-                        <option value="LATEST">최신 후원순</option>
-                        <option value="OLDEST">과거 후원순</option>
-                        <option value="HIGH_AMOUNT">후원금액 높은순</option>
-                        <option value="LOW_AMOUNT">후원금액 낮은순</option>
+                        <option value="LATEST">최신순</option>
+                        <option value="OLDEST">과거순</option>
+                        <option value="HIGH_AMOUNT">금액 높은순</option>
+                        <option value="LOW_AMOUNT">금액 낮은순</option>
                     </select>
                 </div>
             </div>
 
-            {/* 3. 후원 내역 카드 리스트 */}
-            <div className="flex flex-col gap-4">
-                {filteredHistory.length > 0 ? (
-                    filteredHistory.map((item) => {
-                        const progressPercent = Math.min(
-                            100,
-                            Math.round((item.currentAmount / item.targetAmount) * 100)
-                        );
-                        const statusInfo = STATUS_CONFIG[item.status] || { label: item.status, badgeClass: '' };
+            {/* 4. 거래 내역 리스트 (날짜별 그룹) */}
+            <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                {Object.keys(groupedHistory).length > 0 ? (
+                    Object.keys(groupedHistory).map((dateKey) => (
+                        <div key={dateKey} className="border-b border-gray-100 last:border-b-0">
+                            {/* 날짜 구분선 */}
+                            <div className="bg-gray-50/80 px-4 py-2 border-y border-gray-100 text-xs font-semibold text-gray-500 text-left">
+                                {dateKey}
+                            </div>
 
-                        return (
-                            <div
-                                key={item.supportId}
-                                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow text-left"
-                            >
-                                {/* 카드 헤더 (후원번호 & 일시 & 상태) */}
-                                <div className="flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-gray-50/50 text-xs">
-                                    <div className="flex items-center gap-3">
-                                        <span className="font-bold text-gray-500">#SUP-{item.supportId}</span>
-                                        <span className="text-gray-300">|</span>
-                                        <span className="text-gray-500">후원 일시: {formatDate(item.supportedAt)}</span>
-                                    </div>
-                                    <span className={`px-2.5 py-1 rounded-md text-xs font-bold ${statusInfo.badgeClass}`}>
-                                        {statusInfo.label}
-                                    </span>
-                                </div>
+                            {/* 거래 내역 행 목록 */}
+                            <div className="divide-y divide-gray-100">
+                                {groupedHistory[dateKey].map((item) => {
+                                    const isFailed = item.status === 'FAILED';
+                                    const statusInfo = STATUS_CONFIG[item.status] || { label: item.status, badgeClass: '' };
 
-                                {/* 카드 본문 (이미지 + 정보 + 금액) */}
-                                <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                                    {/* 썸네일 & 프로젝트 상세 */}
-                                    <div className="flex items-start gap-4 flex-1">
-                                        <img
-                                            src={item.thumbnailImage}
-                                            alt={item.title}
-                                            className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-100"
-                                        />
-                                        <div className="flex flex-col text-left">
-                                            <span className="text-xs font-semibold text-accent mb-1">
-                                                창작자: {item.creatorNickname}
-                                            </span>
-                                            <h3 className="text-base font-bold text-gray-900 mb-2 leading-snug">
-                                                {item.title}
-                                            </h3>
-
-                                            {/* 달성률 프로그레스 바 */}
-                                            <div className="w-full max-w-sm mt-1">
-                                                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                                                    <span>목표 {formatCurrency(item.targetAmount)}</span>
-                                                    <span className="font-bold text-funding">{progressPercent}% 달성</span>
-                                                </div>
-                                                <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                                    <div
-                                                        className="bg-accent h-full rounded-full transition-all duration-500"
-                                                        style={{ width: `${progressPercent}%` }}
-                                                    />
+                                    return (
+                                        <div
+                                            key={item.supportId}
+                                            className="px-4 py-3.5 hover:bg-slate-50/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left"
+                                        >
+                                            {/* 왼쪽: 거래 내용 (프로젝트/창작자) */}
+                                            <div className="flex items-start gap-3 flex-1 min-w-0">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-0.5">
+                                                        <h3 className="text-sm font-bold text-gray-900 truncate">
+                                                            {item.title}
+                                                        </h3>
+                                                        <span className={`px-2 py-0.5 rounded text-[11px] font-semibold flex-shrink-0 ${statusInfo.badgeClass}`}>
+                                                            {statusInfo.label}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-gray-500 truncate">
+                                                        창작자: {item.creatorNickname} · 결제번호 (#SUP-{item.supportId})
+                                                    </p>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
 
-                                    {/* 후원 금액 & 버튼 그룹 */}
-                                    <div className="flex flex-col items-end gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0 border-gray-100">
-                                        <div className="text-right">
-                                            <span className="text-xs text-gray-400 block mb-0.5">내가 후원한 금액</span>
-                                            <span className="text-xl font-bold text-funding">
-                                                {formatCurrency(item.amount)}
-                                            </span>
-                                        </div>
+                                            {/* 오른쪽: 결제 금액 + 영수증 버튼 */}
+                                            <div className="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 pl-13 sm:pl-0">
+                                                <div className="text-left sm:text-right">
+                                                    <span className={`text-base font-extrabold font-mono ${isFailed ? 'text-emerald-600' : 'text-slate-900'
+                                                        }`}>
+                                                        {isFailed ? `+${formatCurrency(item.amount)}` : formatCurrency(item.amount)}
+                                                    </span>
+                                                    <span className="block text-[11px] text-gray-400">
+                                                        {isFailed ? '환불 완료' : '결제 완료'}
+                                                    </span>
+                                                </div>
 
-                                        <div className="flex items-center gap-2 w-full md:w-auto">
-                                            <button
-                                                onClick={() => setSelectedReceipt(item)}
-                                                className="flex-1 md:flex-initial px-4 py-2 border border-funding text-funding rounded-lg text-xs font-semibold hover:bg-indigo-50 transition-colors"
-                                            >
-                                                상세 영수증
-                                            </button>
-                                            <button
-                                                onClick={() => alert(`${item.creatorNickname} 창작자에게 문의하기 페이지로 이동합니다.`)}
-                                                className="flex-1 md:flex-initial px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-50 transition-colors"
-                                            >
-                                                창작자 문의
-                                            </button>
+                                                <button
+                                                    onClick={() => setSelectedReceipt(item)}
+                                                    className="px-2.5 py-1 border border-gray-300 hover:border-slate-800 text-gray-700 hover:text-slate-900 rounded text-xs transition-colors bg-white shadow-2xs"
+                                                >
+                                                    영수증
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    );
+                                })}
                             </div>
-                        );
-                    })
+                        </div>
+                    ))
                 ) : (
-                    /* 검색/필터 결과가 없을 경우 */
-                    <div className="bg-white border border-dashed border-gray-200 rounded-xl p-12 text-center text-gray-400">
-                        <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    /* 거래 내역 없음 */
+                    <div className="p-12 text-center text-gray-400">
+                        <svg className="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        <p className="text-sm font-medium">조건에 해당되는 후원 내역이 존재하지 않습니다.</p>
+                        <p className="text-xs font-medium">조회 조건에 맞는 거래 및 결제 내역이 존재하지 않습니다.</p>
                     </div>
                 )}
             </div>
 
-            {/* 4. 후원 상세 영수증 Modal */}
+            {/* 5. 전자 결제 영수증 모달 */}
             {selectedReceipt && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
-                    <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden text-left border border-gray-100">
-                        {/* 모달 헤더 */}
-                        <div className="bg-funding text-white px-6 py-4 flex items-center justify-between">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+                    <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden text-left border border-gray-200">
+                        {/* 헤더 */}
+                        <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-bold text-lg">후원 내역 영수증</h3>
-                                <p className="text-xs text-indigo-100">SupportHistory Ref: #{selectedReceipt.supportId}</p>
+                                <h3 className="font-bold text-base">후원 결제 영수증</h3>
+                                <p className="text-[11px] text-slate-400 font-mono">결제번호: SUP-{selectedReceipt.supportId}</p>
                             </div>
                             <button
                                 onClick={() => setSelectedReceipt(null)}
-                                className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                                className="text-slate-400 hover:text-white text-lg font-bold p-1"
                             >
                                 ✕
                             </button>
                         </div>
 
-                        {/* 모달 본문 */}
-                        <div className="p-6 space-y-4 text-xs text-gray-700">
+                        {/* 본문 */}
+                        <div className="p-5 space-y-3.5 text-xs text-gray-700 font-sans">
                             <div className="pb-3 border-b border-gray-100">
-                                <span className="text-gray-400 block mb-1">프로젝트명 (Projects.TITLE)</span>
-                                <p className="font-bold text-sm text-gray-900 leading-tight">{selectedReceipt.title}</p>
+                                <span className="text-gray-400 block mb-0.5">프로젝트명</span>
+                                <p className="font-bold text-sm text-gray-900 leading-snug">{selectedReceipt.title}</p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 pb-3 border-b border-gray-100">
+                            <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-100">
                                 <div>
-                                    <span className="text-gray-400 block mb-0.5">후원자 ID (Users)</span>
-                                    <p className="font-semibold text-gray-800">{selectedReceipt.userId}</p>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 block mb-0.5">창작자 (Creator)</span>
+                                    <span className="text-gray-400 block mb-0.5">창작자 (수령인)</span>
                                     <p className="font-semibold text-gray-800">{selectedReceipt.creatorNickname}</p>
                                 </div>
+                                <div>
+                                    <span className="text-gray-400 block mb-0.5">후원자 ID</span>
+                                    <p className="font-semibold text-gray-800">{selectedReceipt.userId}</p>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 pb-3 border-b border-gray-100">
+                            <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-100">
                                 <div>
-                                    <span className="text-gray-400 block mb-0.5">후원 승인 일시</span>
+                                    <span className="text-gray-400 block mb-0.5">결제 일시</span>
                                     <p className="font-semibold text-gray-800">{formatDate(selectedReceipt.supportedAt)}</p>
                                 </div>
                                 <div>
-                                    <span className="text-gray-400 block mb-0.5">프로젝트 상태</span>
-                                    <p className="font-semibold text-funding">{STATUS_CONFIG[selectedReceipt.status]?.label}</p>
+                                    <span className="text-gray-400 block mb-0.5">결제 상태</span>
+                                    <p className="font-semibold text-slate-900">
+                                        {STATUS_CONFIG[selectedReceipt.status]?.label}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="bg-gray-50 p-4 rounded-xl space-y-2 border border-gray-100">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500">창작자 정산 은행</span>
-                                    <span className="font-semibold">{selectedReceipt.bankName}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500">창작자 계좌번호</span>
-                                    <span className="font-semibold">{selectedReceipt.accountNum}</span>
+                            <div className="bg-gray-50 p-3.5 rounded-xl space-y-1.5 border border-gray-200">
+                                <div className="flex justify-between text-gray-500">
+                                    <span>결제 수단</span>
+                                    <span className="font-medium text-gray-800">{selectedReceipt.bankName}</span>
                                 </div>
                                 <div className="flex justify-between pt-2 border-t border-gray-200 text-sm">
-                                    <span className="font-bold text-gray-900">최종 후원 결제 금액</span>
-                                    <span className="font-bold text-funding text-base">
+                                    <span className="font-bold text-gray-900">최종 결제 금액</span>
+                                    <span className="font-extrabold font-mono text-slate-900 text-base">
                                         {formatCurrency(selectedReceipt.amount)}
                                     </span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* 모달 푸터 */}
-                        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+                        {/* 푸터 */}
+                        <div className="p-3.5 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
                             <button
                                 onClick={() => window.print()}
-                                className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-100"
+                                className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-100"
                             >
-                                영수증 인쇄
+                                인쇄
                             </button>
                             <button
                                 onClick={() => setSelectedReceipt(null)}
-                                className="px-4 py-2 bg-funding text-white rounded-lg text-xs font-semibold hover:bg-indigo-600"
+                                className="px-3.5 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800"
                             >
                                 닫기
                             </button>
