@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // 라우터 이동을 위한 Link 컴포넌트 추가
+import { Link, useNavigate } from 'react-router-dom'; // 라우터 이동을 위한 Link 컴포넌트 추가
 import profileImg from '../../assets/profile.png';
 import arrowDownImg from '../../assets/arrowdown.svg';
 
 function ProfileMenu(props) {
+    const navigate = useNavigate();
+
     const [userInfo, setUserInfo] = useState({
         imageUrl: profileImg,
         nickname: "동구리",
@@ -85,8 +87,20 @@ function ProfileMenu(props) {
                         {/* 로그아웃 (마지막 위치 유지) */}
                         <button
                             onClick={() => {
+
+                                // JWT delete
+                                localStorage.removeItem("accessToken");
+
+                                // 사용자 권한 삭제
+                                localStorage.removeItem("userRole");
+
+                                // Dropdown closed
                                 toggleDropdown();
+
                                 alert('로그아웃 되었습니다.');
+
+                                // 메인페이지 이동
+                                window.location.href = "/";
                             }}
                             className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 border-t border-gray-100"
                             role="menuitem"
