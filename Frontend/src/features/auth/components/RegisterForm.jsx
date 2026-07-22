@@ -31,6 +31,8 @@ function RegisterForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        console.log("전송 데이터: ", registerData);
+
         try {
 
             const response = await register(registerData);
