@@ -13,14 +13,25 @@ import com.fundchain.hashchain.dto.HashChainVerifyResponseDto;
 public interface HashChainService {
 
     /**
-     * 1. 신규 거래 등록 (해시 체인 생성 및 거래 내역 저장)
+     * 1. 신규 거래 등록 (해시 체인 생성 및 거래 내역 저장 - 기본 거래 유형: SUPPORT)
      *
      * @param projectId 펀딩 프로젝트 ID
-     * @param userId    후원자 ID
+     * @param userId    후원자 ID (String)
      * @param amount    후원 금액
      * @return 생성된 거래 내역의 PK (ID)
      */
-    Long createTransaction(Long projectId, Long userId, Long amount);
+    Long createTransaction(Long projectId, String userId, Long amount);
+
+    /**
+     * 1-1. 신규 거래 등록 (거래 유형 지정 가능)
+     *
+     * @param projectId       펀딩 프로젝트 ID
+     * @param userId          후원자 ID (String)
+     * @param amount          거래 금액
+     * @param transactionType 거래 유형 ('SUPPORT', 'SETTLEMENT', 'REFUND' 등)
+     * @return 생성된 거래 내역의 PK (ID)
+     */
+    Long createTransaction(Long projectId, String userId, Long amount, String transactionType);
 
     /**
      * 2. 해시 체인 무결성 검증 (전체 거래 내역 위변조 여부 검사)

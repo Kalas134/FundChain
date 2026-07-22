@@ -11,7 +11,7 @@ import com.fundchain.hashchain.dto.HashChainVerifyResponseDto;
 /**
  * 거래 해시 체인 관리 REST 컨트롤러
  * <p>
- * 신규 거래(후원) 등록 요청 처리 및 거래 내역 무결성 검증 API를 제공합니다.
+ * 신규 거래(후원/정산/환불) 등록 요청 처리 및 거래 내역 무결성 검증 API를 제공합니다.
  */
 @Tag(name = "거래 해시 체인 관리 API", description = "거래 내역 기록 및 무결성 검증 담당")
 @RestController
@@ -22,21 +22,23 @@ public class HashChainController {
     private final HashChainService hashChainService;
 
     /**
-     * 새로운 거래(후원) 발생 및 해시 체이닝 저장 API
+     * 새로운 거래(후원, 정산, 환불) 발생 및 해시 체이닝 저장 API
      *
-     * @param projectId 펀딩 프로젝트 ID
-     * @param userId    후원자 ID
-     * @param amount    후원 금액
+     * @param projectId       펀딩 프로젝트 ID
+     * @param userId          사용자 ID
+     * @param amount          거래 금액
+     * @param transactionType 거래 유형 (기본값: SUPPORT)
      * @return 거래 기록 처리 결과 메시지
      */
-    @Operation(summary = "새로운 거래(후원) 발생 및 해시 체이닝 저장")
+    @Operation(summary = "새로운 거래 발생 및 해시 체이닝 저장")
     @PostMapping
     public ResponseEntity<String> createTransaction(
             @RequestParam Long projectId,
-            @RequestParam Long userId,
-            @RequestParam Long amount) {
+            @RequestParam String userId,
+            @RequestParam Long amount,
+            @RequestParam(required = false, defaultValue = "SUPPORT") String transactionType) {
 
-        Long ledgerId = hashChainService.createTransaction(projectId, userId, amount);
+        Long ledgerId = hashChainService.createTransaction(projectId, userId, amount, transactionType);
         return ResponseEntity.ok("거래가 성공적으로 기록되었습니다. 거래 내역 번호: " + ledgerId);
     }
 

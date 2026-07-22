@@ -26,25 +26,29 @@ public class HashChainServiceImpl implements HashChainService {
     private final TransactionLedgerRepository ledgerRepository;
 
     /**
-     * 1. 신규 거래 등록 (해시 체인 생성 및 거래 내역 저장)
-     *
-     * 직전 거래의 해시값을 가져와 현재 거래 정보와 조합한 후 SHA-256 해시를 산출하여 DB에 저장합니다.
-     *
-     * @param projectId 펀딩 프로젝트 ID
-     * @param userId    후원자 ID
-     * @param amount    후원 금액
-     * @return 생성된 거래 내역의 PK (ID)
+     * 1. 신규 거래 등록 (기본 거래 유형: SUPPORT)
      */
     @Override
     @Transactional
-    public Long createTransaction(Long projectId, Long userId, Long amount) {
+    public Long createTransaction(Long projectId, String userId, Long amount) {
+        return createTransaction(projectId, userId, amount, "SUPPORT");
+    }
+
+    /**
+     * 1-1. 신규 거래 등록 (거래 유형 지정)
+     */
+    @Override
+    @Transactional
+    public Long createTransaction(Long projectId, String userId, Long amount, String transactionType) {
+        String type = (transactionType != null) ? transactionType : "SUPPORT";
+
         // [Step 1] 이전 거래 내역 조회 (없으면 최초 거래이므로 64자리 0으로 구성된 제네시스 해시 세팅)
         String previousHash = ledgerRepository.findFirstByOrderByIdDesc()
                 .map(TransactionLedger::getCurrentHash)
                 .orElse("0000000000000000000000000000000000000000000000000000000000000000");
 
         // [Step 2] 현재 거래 정보와 이전 해시를 조합하여 고유 문자열 생성
-        String dataToHash = previousHash + "_" + projectId + "_" + userId + "_" + amount;
+        String dataToHash = previousHash + "_" + projectId + "_" + userId + "_" + type + "_" + amount;
 
         // [Step 3] SHA-256 해시값 생성
         String currentHash = calculateSha256(dataToHash);
@@ -53,6 +57,7 @@ public class HashChainServiceImpl implements HashChainService {
         TransactionLedger ledger = TransactionLedger.builder()
                 .projectId(projectId)
                 .userId(userId)
+                .transactionType(type)
                 .amount(amount)
                 .previousHash(previousHash)
                 .currentHash(currentHash)
@@ -79,7 +84,7 @@ public class HashChainServiceImpl implements HashChainService {
             TransactionLedger current = chain.get(i);
 
             // 검증 A: 현재 장부의 데이터를 가지고 새로 계산한 해시가 저장된 해시와 일치하는가?
-            String dataToHash = current.getPreviousHash() + "_" + current.getProjectId() + "_" + current.getUserId() + "_" + current.getAmount();
+            String dataToHash = current.getPreviousHash() + "_" + current.getProjectId() + "_" + current.getUserId() + "_" + current.getTransactionType() + "_" + current.getAmount();
             String calculatedHash = calculateSha256(dataToHash);
 
             if (!current.getCurrentHash().equals(calculatedHash)) {
