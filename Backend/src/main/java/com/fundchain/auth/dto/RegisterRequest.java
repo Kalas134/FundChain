@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,13 +22,13 @@ public class RegisterRequest {
 
 
     // API 문서: username
-    @JsonProperty("username")
+    @JsonProperty("userName")
     private String userName;
 
 
     // API 문서: birthdate
-    @JsonProperty("birthdate")
-    private String birthDate;
+    @JsonProperty("birthDate")
+    private LocalDate birthDate;
 
 
     private String phoneNum;
