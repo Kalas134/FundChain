@@ -1,7 +1,36 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/Logo.png";
+import ProfileMenu from "../common/ProfileMenu";
 
 function Header() {
+
+    const token = localStorage.getItem("accessToken");
+
+    const userRole = localStorage.getItem("userRole");
+
+    const roleMenu = {
+        USER: (
+            <>
+            </>
+        ),
+
+        CREATOR: (
+            <>
+                <Link to="/project/register">
+                    프로젝트 올리기
+                </Link>
+            </>
+        ),
+
+        ADMIN: (
+            <>
+                <Link to="/admin">
+                    관리자 페이지
+                </Link>
+            </>
+        )
+    };
+
     return (
         <header className="header">
             {/* 좌측 : 로고 */}
@@ -18,10 +47,23 @@ function Header() {
                 {/* 검색기능란 */}
             </div>
             <div className="header_right1">
-                <Link>{/* 프로젝트 올리는 링크 */}</Link>
+                {
+                    token &&
+                    roleMenu[userRole]
+                }
             </div>
             <div className="header_right2">
-                <p><Link to="/login">로그인/회원가입</Link></p>
+                {
+                    token
+                    ?
+                    <ProfileMenu />
+                    :
+                    (
+                        <p><Link to="/login">
+                            로그인/회원가입
+                        </Link></p>
+                    )
+                }
             </div>
         </header>
     );

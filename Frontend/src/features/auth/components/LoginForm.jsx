@@ -31,15 +31,19 @@ function LoginForm() {
 
             console.log("로그인 성공 : ", response);
 
-            /*
-            JWT 적용 이후 처리 예정
+            
+            // JWT 적용 이후 처리
 
             localStorage.setItem(
                 "accessToken",
                 response.accessToken
             );
 
-            */
+            localStorage.setItem(
+                "userRole",
+                response.userRole
+            );
+            
 
             alert("로그인 성공");
 
