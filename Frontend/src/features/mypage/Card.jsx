@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import editIcon from '../../assets/edit.svg';
 import checkIcon from '../../assets/check.svg';
 import closeIcon from '../../assets/close.svg';
@@ -6,21 +6,27 @@ import closeIcon from '../../assets/close.svg';
 /**
  * 프로필 정보를 카드 형태로 보여주고, 수정/저장 기능을 제공하는 컴포넌트
  * @param {Object} props - 컴포넌트 속성
- * @param {Object} props.userInfo - 사용자 프로필 정보 객체 (imageUrl, nickname, name, birth, email, phone)
+ * @param {Object} props.userInfo - 사용자 프로필 정보 객체 (imageUrl, nickname, username, birthdate, email, phoneNum, bankName, accountNum)
  * @param {Function} props.onUpdate - 프로필 정보 저장 시 상위 컴포넌트로 변경된 정보를 전달하는 콜백 함수
  */
 function Card({ userInfo, onUpdate }) {
     // 수정 모드 활성화 여부 상태
     const [isEditing, setIsEditing] = useState(false);
+    // 저장 중 상태
+    const [isSaving, setIsSaving] = useState(false);
     // 수정 취소 또는 완료 전까지 임시로 입력값을 보관하는 상태
     const [tempInfo, setTempInfo] = useState({ ...userInfo });
+
+    useEffect(() => {
+        setTempInfo({ ...userInfo });
+    }, [userInfo]);
 
     /**
      * 카드 클릭 시 수정 모드로 전환하는 핸들러
      * 이미 수정 모드인 경우 재전환을 방지합니다.
      */
     const handleCardClick = () => {
-        if (!isEditing) {
+        if (!isEditing && !isSaving) {
             setTempInfo({ ...userInfo });
             setIsEditing(true);
         }
@@ -43,21 +49,33 @@ function Card({ userInfo, onUpdate }) {
      * 이벤트 전파를 중단(e.stopPropagation)하고 상위 컴포넌트의 onUpdate를 호출합니다.
      * @param {React.MouseEvent<HTMLButtonElement>} e - 클릭 이벤트 객체
      */
-    const handleSave = (e) => {
+    const handleSave = async (e) => {
         e.stopPropagation();
-        onUpdate(tempInfo);
-        setIsEditing(false);
+        try {
+            setIsSaving(true);
+            await onUpdate(tempInfo);
+            setIsEditing(false);
+        } catch (err) {
+            // 에러 시 편집 모드 유지
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     /**
      * 수정 취소 버튼 클릭 시 핸들러
-     * 변경 내용을 저정하지 않고 수정 모드를 종료합니다.
+     * 변경 내용을 저장하지 않고 수정 모드를 종료합니다.
      * @param {React.MouseEvent<HTMLButtonElement>} e - 클릭 이벤트 객체
      */
     const handleCancel = (e) => {
         e.stopPropagation();
+        setTempInfo({ ...userInfo });
         setIsEditing(false);
     };
+
+    const displayName = userInfo.username || userInfo.name || '-';
+    const displayBirth = userInfo.birthdate || userInfo.birth || '-';
+    const displayPhone = userInfo.phoneNum || userInfo.phone || '-';
 
     return (
         <div
@@ -69,7 +87,7 @@ function Card({ userInfo, onUpdate }) {
             {userInfo.imageUrl && (
                 <img
                     src={userInfo.imageUrl}
-                    alt={userInfo.nickname}
+                    alt={userInfo.nickname || '프로필'}
                     className="size-48 flex-shrink-0 rounded-full object-cover shadow-inner mx-8 my-4 select-none"
                 />
             )}
@@ -79,22 +97,37 @@ function Card({ userInfo, onUpdate }) {
                 {!isEditing ? (
                     /* 1. 읽기 전용 모드 (뷰 모드) */
                     <div className="space-y-3">
-                        <h2 className="mb-4 text-2xl font-bold text-gray-800">{userInfo.nickname}</h2>
+                        <div className="flex items-center gap-3 mb-4">
+                            <h2 className="text-2xl font-bold text-gray-800">{userInfo.nickname || '닉네임 없음'}</h2>
+                            {userInfo.userRole && (
+                                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    {userInfo.userRole}
+                                </span>
+                            )}
+                        </div>
                         <p className="leading-relaxed text-gray-600 text-sm">
                             <span className="font-semibold text-gray-400 mr-2 inline-block w-20">이름</span>
-                            {userInfo.name}
+                            {displayName}
                         </p>
                         <p className="leading-relaxed text-gray-600 text-sm">
                             <span className="font-semibold text-gray-400 mr-2 inline-block w-20">생년월일</span>
-                            {userInfo.birth}
+                            {displayBirth}
                         </p>
                         <p className="leading-relaxed text-gray-600 text-sm">
                             <span className="font-semibold text-gray-400 mr-2 inline-block w-20">이메일</span>
-                            {userInfo.email}
+                            {userInfo.email || '-'}
                         </p>
                         <p className="leading-relaxed text-gray-600 text-sm">
                             <span className="font-semibold text-gray-400 mr-2 inline-block w-20">연락처</span>
-                            {userInfo.phone}
+                            {displayPhone}
+                        </p>
+                        <p className="leading-relaxed text-gray-600 text-sm">
+                            <span className="font-semibold text-gray-400 mr-2 inline-block w-20">은행명</span>
+                            {userInfo.bankName || '-'}
+                        </p>
+                        <p className="leading-relaxed text-gray-600 text-sm">
+                            <span className="font-semibold text-gray-400 mr-2 inline-block w-20">계좌번호</span>
+                            {userInfo.accountNum || '-'}
                         </p>
                     </div>
                 ) : (
@@ -105,7 +138,7 @@ function Card({ userInfo, onUpdate }) {
                             <input
                                 type="text"
                                 name="nickname"
-                                value={tempInfo.nickname}
+                                value={tempInfo.nickname || ''}
                                 onChange={handleChange}
                                 className="text-xl font-bold border-b-2 border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent pb-1"
                                 placeholder="닉네임"
@@ -113,47 +146,66 @@ function Card({ userInfo, onUpdate }) {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 mb-0.5">이름</label>
+                            <label className="block text-xs font-bold text-gray-400 mb-0.5">이름 (수정 불가)</label>
                             <input
                                 type="text"
-                                name="name"
-                                value={tempInfo.name}
-                                onChange={handleChange}
-                                className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
-                                placeholder="이름"
+                                value={displayName}
+                                disabled
+                                className="text-sm border-b border-gray-200 bg-gray-50 text-gray-500 w-full py-0.5 cursor-not-allowed"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 mb-0.5">생년월일</label>
+                            <label className="block text-xs font-bold text-gray-400 mb-0.5">생년월일 (수정 불가)</label>
                             <input
                                 type="text"
-                                name="birth"
-                                value={tempInfo.birth}
-                                onChange={handleChange}
-                                className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
-                                placeholder="생년월일"
+                                value={displayBirth}
+                                disabled
+                                className="text-sm border-b border-gray-200 bg-gray-50 text-gray-500 w-full py-0.5 cursor-not-allowed"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-400 mb-0.5">이메일</label>
+                            <label className="block text-xs font-bold text-gray-400 mb-0.5">이메일 (수정 불가)</label>
                             <input
                                 type="email"
-                                name="email"
-                                value={tempInfo.email}
-                                onChange={handleChange}
-                                className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
-                                placeholder="이메일"
+                                value={userInfo.email || ''}
+                                disabled
+                                className="text-sm border-b border-gray-200 bg-gray-50 text-gray-500 w-full py-0.5 cursor-not-allowed"
                             />
                         </div>
                         <div>
                             <label className="block text-xs font-bold text-gray-400 mb-0.5">연락처</label>
                             <input
                                 type="text"
-                                name="phone"
-                                value={tempInfo.phone}
-                                onChange={handleChange}
+                                name="phoneNum"
+                                value={tempInfo.phoneNum !== undefined ? tempInfo.phoneNum : (tempInfo.phone || '')}
+                                onChange={(e) => {
+                                    handleChange({ target: { name: 'phoneNum', value: e.target.value } });
+                                    handleChange({ target: { name: 'phone', value: e.target.value } });
+                                }}
                                 className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
                                 placeholder="연락처"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 mb-0.5">은행명</label>
+                            <input
+                                type="text"
+                                name="bankName"
+                                value={tempInfo.bankName || ''}
+                                onChange={handleChange}
+                                className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
+                                placeholder="은행명"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 mb-0.5">계좌번호</label>
+                            <input
+                                type="text"
+                                name="accountNum"
+                                value={tempInfo.accountNum || ''}
+                                onChange={handleChange}
+                                className="text-sm border-b border-gray-300 focus:border-accent focus:outline-none w-full bg-transparent py-0.5 text-gray-700"
+                                placeholder="계좌번호"
                             />
                         </div>
                     </div>
@@ -166,7 +218,8 @@ function Card({ userInfo, onUpdate }) {
                     <button
                         type="button"
                         onClick={handleSave}
-                        className="p-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200"
+                        disabled={isSaving}
+                        className="p-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
                         title="수정 완료"
                     >
                         <img src={checkIcon} alt="check" className="w-5 h-5 filter brightness-0 invert" />
@@ -174,7 +227,8 @@ function Card({ userInfo, onUpdate }) {
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="p-2 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200"
+                        disabled={isSaving}
+                        className="p-2 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
                         title="수정 취소"
                     >
                         <img src={closeIcon} alt="close" className="w-5 h-5 filter brightness-0 invert" />
@@ -197,4 +251,4 @@ function Card({ userInfo, onUpdate }) {
     );
 }
 
-export default Card;
+export default Card;

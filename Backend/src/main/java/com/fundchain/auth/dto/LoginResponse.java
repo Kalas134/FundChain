@@ -43,4 +43,8 @@ public class LoginResponse {
     private String userRole;
 
     private String token;
+
+    public String getAccessToken() {
+        return token;
+    }
 }
