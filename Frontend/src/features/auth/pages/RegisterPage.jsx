@@ -1,10 +1,10 @@
 import React from 'react';
-import RegistryForm from '../components/RegistryForm';
+import RegisterForm from '../components/RegisterForm';
 
 function RegisterPage() {
     return (
-        <div className="RegistryPage">
-            <RegistryForm />
+        <div className="registerPage">
+            <RegisterForm />
         </div>
     );
 }

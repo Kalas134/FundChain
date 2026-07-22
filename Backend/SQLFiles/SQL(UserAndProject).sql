@@ -1,18 +1,29 @@
 SELECT current_database();
 
--- User table
+DROP TABLE IF EXISTS Users;
 
-create table Users (
-	USERID varchar(10),
-    USER_ROLE varchar(20), -- User Creator admin
-    PASSWORD varchar(100) not null,
-	NICKNAME varchar(30) unique not null,
-	USERNAME varchar(30) not null,
-	BIRTHDATE DATE not null,
-	PHONE_NUM varchar(20) not null,
-	EMAIL varchar(100) not null,
-    BANK_NAME varchar(30),
-	ACCOUNT_NUM varchar(25),
-	-- 전부 임시임 회의 필요
-	primary key (USERCREATER, USERID)
+
+CREATE TABLE Users (
+    USER_ID VARCHAR(50) PRIMARY KEY,
+
+    USER_ROLE VARCHAR(20) NOT NULL
+        CHECK (USER_ROLE IN ('USER', 'CREATOR', 'ADMIN')),
+
+    PASSWORD VARCHAR(100) NOT NULL,
+
+    NICKNAME VARCHAR(30) NOT NULL UNIQUE,
+
+    USERNAME VARCHAR(50) NOT NULL,
+
+    BIRTHDATE DATE NOT NULL,
+
+    PHONE_NUM VARCHAR(20) NOT NULL UNIQUE,
+
+    EMAIL VARCHAR(100) NOT NULL UNIQUE,
+
+    BANK_NAME VARCHAR(30),
+
+    ACCOUNT_NUM VARCHAR(25),
+
+    IS_DELETED BOOLEAN NOT NULL DEFAULT FALSE
 );

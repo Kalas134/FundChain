@@ -6,7 +6,7 @@ import RegisterPage from "../features/auth/pages/RegisterPage";
 const AuthRouter = (
     <>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/Resistry" element={<RegisterPage />} />
+        <Route path="/RegisterPage" element={<RegisterPage />} />
     </>
 )
 
