@@ -11,6 +11,9 @@ export default {
         funding: 'var(--primary-btn)', // #6366F1
         warning: 'var(--warning)',     // #FF6584
         accent: 'var(--accent)',       // #00D4B2
+        tcolor: 'var(--text)',
+        thcolor: 'var(--text)',
+        bg: 'var(--bg)'
       }
     },
   },
