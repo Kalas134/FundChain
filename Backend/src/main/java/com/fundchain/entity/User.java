@@ -136,4 +136,23 @@ public class User {
     )
     @Builder.Default
     private Boolean isDeleted = false;
+
+
+    /**
+     * 회원 정보 수정 (마이페이지)
+     */
+    public void updateMyPageInfo(String nickname, String phoneNum, String bankName, String accountNum) {
+        if (nickname != null && !nickname.isBlank()) {
+            this.nickname = nickname;
+        }
+        if (phoneNum != null && !phoneNum.isBlank()) {
+            this.phoneNum = phoneNum;
+        }
+        if (bankName != null) {
+            this.bankName = bankName;
+        }
+        if (accountNum != null) {
+            this.accountNum = accountNum;
+        }
+    }
 }
