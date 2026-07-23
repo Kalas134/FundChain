@@ -31,6 +31,7 @@ public class RegisterRequest {
     private LocalDate birthDate;
 
 
+
     private String phoneNum;
 
     private String email;
