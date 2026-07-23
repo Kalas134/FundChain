@@ -33,4 +33,16 @@ public class ProjectContent {
     @MapsId
     @JoinColumn(name = "PROJECT_ID")
     private Project project;
+
+
+    /**
+     * 프로젝트 상세 내용 수정
+     */
+    public void updateContent(String contentHtml) {
+
+        if (contentHtml != null) {
+            this.contentHtml = contentHtml;
+        }
+    }
+
 }

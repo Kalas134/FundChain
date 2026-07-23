@@ -77,4 +77,48 @@ public class Project {
             fetch = FetchType.LAZY
     )
     private ProjectContent projectContent;
+
+    /**
+     * 프로젝트 상세 내용 연결
+     */
+    public void addProjectContent(ProjectContent projectContent) {
+        this.projectContent = projectContent;
+    }
+
+    /**
+     * 프로젝트 정보 수정
+     */
+    public void updateProject(
+            String title,
+            String thumbnailImage,
+            BigDecimal targetAmount,
+            OffsetDateTime startDate,
+            OffsetDateTime endDate,
+            ProjectStatus status
+    ) {
+
+        if (title != null) {
+            this.title = title;
+        }
+
+        if (thumbnailImage != null) {
+            this.thumbnailImage = thumbnailImage;
+        }
+
+        if (targetAmount != null) {
+            this.targetAmount = targetAmount;
+        }
+
+        if (startDate != null) {
+            this.startDate = startDate;
+        }
+
+        if (endDate != null) {
+            this.endDate = endDate;
+        }
+
+        if (status != null) {
+            this.status = status;
+        }
+    }
 }
