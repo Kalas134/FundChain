@@ -1,6 +1,6 @@
 import React from 'react';
 
-function DonationForm() {
+function SupportForm() {
     return (
         <div>
             
@@ -8,4 +8,4 @@ function DonationForm() {
     );
 }
 
-export default DonationForm;
+export default SupportForm;
