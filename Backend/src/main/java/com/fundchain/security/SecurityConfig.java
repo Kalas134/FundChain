@@ -1,16 +1,24 @@
 package com.fundchain.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    // 암호화 관련 Bean 세팅 (현재 세팅만 해놓고 아직 사용은 안함)
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+
+    // 암호화 관련 Bean 세팅
     @Bean
     public PasswordEncoder passwordEncoder(
             SHA256PasswordEncoder encoder
@@ -18,21 +26,38 @@ public class SecurityConfig {
         return encoder;
     }
 
-    // 필터체인 관련
+
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
+
+
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/auth/**"
                         ).permitAll()
+
+                        // 현재 테스트 단계
                         .anyRequest().permitAll()
                 )
-                .formLogin(Customizer.withDefaults());
+
+
+                // JWT Filter 연결
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
+
+
         return http.build();
     }
 }

@@ -5,6 +5,7 @@ import com.fundchain.auth.dto.LoginResponse;
 import com.fundchain.auth.dto.RegisterRequest;
 import com.fundchain.entity.User;
 import com.fundchain.repository.UserRepository;
+import com.fundchain.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.security.crypto.password.PasswordEncoder; //인코더 적용 시 사용
 import org.springframework.stereotype.Service;
@@ -16,6 +17,10 @@ import java.time.LocalDate;
 public class AuthService {
 
     private final UserRepository userRepository;
+
+    // JWT 생성 담당
+    private final JwtProvider jwtProvider;
+
 
     /*
     비번 암호화 세팅
@@ -103,11 +108,19 @@ public class AuthService {
         */
 
 
+        // JWT 생성
+        String token =
+                jwtProvider.createToken(
+                        user.getUserId(),
+                        user.getUserRole()
+                );
+
+
         return new LoginResponse(
                 user.getUserId(),
                 user.getNickname(),
                 user.getUserRole(),
-                ""
+                token
         );
     }
 }
