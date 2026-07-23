@@ -31,17 +31,18 @@ function LoginForm() {
 
             console.log("로그인 성공 : ", response);
 
-            /*
-            JWT 적용 이후 처리 예정
-
-            localStorage.setItem(
-                "accessToken",
-                response.accessToken
-            );
-
-            */
+            const token = response.token || response.accessToken;
+            if (token) {
+                localStorage.setItem("accessToken", token);
+            }
+            if (response.userRole) {
+                localStorage.setItem("userRole", response.userRole);
+            }
 
             alert("로그인 성공");
+
+            // 메인 페이지 이동 + React 전체 재실행
+            window.location.href = "/";
 
         } catch (error) {
 

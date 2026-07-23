@@ -65,7 +65,7 @@ public class AuthService {
 
                 .nickname(request.getNickname())
                 .userName(request.getUserName())
-                .birthDate(LocalDate.parse(request.getBirthDate()))
+                .birthDate(request.getBirthDate())
                 .phoneNum(request.getPhoneNum())
                 .email(request.getEmail())
                 .bankName(request.getBankName())
