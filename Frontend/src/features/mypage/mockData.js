@@ -57,3 +57,58 @@ export const mockProjects = [
         month: 11
     }
 ];
+
+/**
+ * 창작자의 내 프로젝트 관리 화면에서 사용하는 가상 테스트 데이터 (Mock Data)
+ * status: 'PREPARING' (준비중) | 'ONGOING' (진행중) | 'SUCCESS' (성공) | 'FAILED' (실패)
+ */
+export const mockCreatorProjects = [
+    {
+        id: 101,
+        imageUrl: "https://via.placeholder.com/150",
+        createdDate: "2023. 04. 15 생성",
+        title: "스마트 홈 IoT 가젯 프로젝트",
+        description: "쉽고 빠르게 구축하는 차세대 스마트홈 허브 및 센서 패키지",
+        targetAmount: 10000000,
+        currentAmount: 12500000,
+        status: "ONGOING",
+        year: 2023,
+        month: 4
+    },
+    {
+        id: 102,
+        imageUrl: "https://via.placeholder.com/150",
+        createdDate: "2023. 01. 10 생성",
+        title: "친환경 비건 텀블러 & 오가닉 백",
+        description: "지구를 살리는 지속 가능한 친환경 텀블러 디자인 프로젝트",
+        targetAmount: 5000000,
+        currentAmount: 6200000,
+        status: "SUCCESS",
+        year: 2023,
+        month: 1
+    },
+    {
+        id: 103,
+        imageUrl: "https://via.placeholder.com/150",
+        createdDate: "2023. 06. 01 생성",
+        title: "초고음질 블루투스 수제 헤드폰",
+        description: "장인의 손길로 제작하는 최고급 원목 하우징 수제 헤드폰",
+        targetAmount: 20000000,
+        currentAmount: 3500000,
+        status: "PREPARING",
+        year: 2023,
+        month: 6
+    },
+    {
+        id: 104,
+        imageUrl: "https://via.placeholder.com/150",
+        createdDate: "2022. 09. 12 생성",
+        title: "아날로그 필름 감성 미니 카메라",
+        description: "포켓 사이즈로 즐기는 독창적인 레트로 필름 카메라",
+        targetAmount: 8000000,
+        currentAmount: 2400000,
+        status: "FAILED",
+        year: 2022,
+        month: 9
+    }
+];

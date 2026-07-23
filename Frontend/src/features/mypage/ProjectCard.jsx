@@ -48,9 +48,11 @@ const ProjectCard = ({ project }) => {
 
                 {/* 하단 액션 버튼 그룹 (후기 작성, 후원 상세 보기, 창작자 문의) */}
                 <div className="flex border-t border-gray-100 p-3 px-6 gap-3">
-                    <button className="flex-1 py-2.5 border border-red-400 text-red-400 rounded text-sm font-semibold text-center hover:bg-red-50 transition-colors">
-                        후기 작성
-                    </button>
+                    {project?.status === 'success' && (
+                        <button className="flex-1 py-2.5 border border-accent text-accent rounded text-sm font-semibold text-center hover:bg-accent/10 transition-colors">
+                            후기 작성
+                        </button>
+                    )}
                     <button className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
                         후원 상세
                     </button>

@@ -100,7 +100,7 @@ function Card({ userInfo, onUpdate }) {
                         <div className="flex items-center gap-3 mb-4">
                             <h2 className="text-2xl font-bold text-gray-800">{userInfo.nickname || '닉네임 없음'}</h2>
                             {userInfo.userRole && (
-                                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-accent/15 text-accent border border-accent/30">
                                     {userInfo.userRole}
                                 </span>
                             )}
@@ -219,7 +219,7 @@ function Card({ userInfo, onUpdate }) {
                         type="button"
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="p-2 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
+                        className="p-2 bg-accent hover:opacity-90 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
                         title="수정 완료"
                     >
                         <img src={checkIcon} alt="check" className="w-5 h-5 filter brightness-0 invert" />
@@ -228,7 +228,7 @@ function Card({ userInfo, onUpdate }) {
                         type="button"
                         onClick={handleCancel}
                         disabled={isSaving}
-                        className="p-2 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
+                        className="p-2 bg-warning hover:opacity-90 active:scale-95 text-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50"
                         title="수정 취소"
                     >
                         <img src={closeIcon} alt="close" className="w-5 h-5 filter brightness-0 invert" />
