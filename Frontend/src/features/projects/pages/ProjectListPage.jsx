@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useProjects } from "../hooks/useProjects";
+import useProjects from "../hooks/useProjects";
 import ProjectCard from "../components/ProjectCard";
 
 
