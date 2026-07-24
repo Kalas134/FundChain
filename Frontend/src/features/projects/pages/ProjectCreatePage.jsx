@@ -32,6 +32,7 @@ function ProjectCreatePage() {
             <h1>프로젝트 등록</h1>
             <ProjectForm
                 onSubmit={handleSubmit}
+                submitText="등록"
             />
         </div>
     );

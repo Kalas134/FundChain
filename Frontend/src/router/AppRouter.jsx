@@ -3,7 +3,7 @@ import AppLayout from "../components/layout/AppLayout";
 import Common_UIRouter from "./Common_UIRouter";
 import AuthRouter from "./AuthRouter";
 import MyPageRouter from "./MyPageRouter";
-// import ProjectRouter from "./ProjectRouter";
+import ProjectRouter from "./ProjectRouter";
 
 function AppRouter() {
     return (
@@ -12,7 +12,7 @@ function AppRouter() {
                 {Common_UIRouter}
                 {AuthRouter}
                 {MyPageRouter}
-                {/* {ProjectRouter} */}
+                {ProjectRouter}
             </Route>
         </Routes>
     );

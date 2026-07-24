@@ -56,3 +56,11 @@
     margin-top: 8px;
     flex-direction: row;
 }
+
+.ProjectDetailBtn {
+    margin-top: 20px ;
+}
+
+.ProjectDetailEditBtn {
+    margin-right: 10px;
+}

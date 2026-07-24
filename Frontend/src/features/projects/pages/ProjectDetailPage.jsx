@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import useProjects from "../hooks/useProjects";
 
@@ -7,16 +7,39 @@ function ProjectDetailPage() {
 
     const { projectId } = useParams();
 
+    const navigate = useNavigate();
+
     const {
         project,
         loading,
         error,
-        fetchProject
+        fetchProject,
+        removeProject
     } = useProjects();
 
     useEffect(() => {
         fetchProject(projectId);
-    }, [projectId]);
+    }, [projectId, fetchProject]);
+
+    const handleDelete = async () => {
+        if (!window.confirm("정말 삭제하시겠습니까?")) {
+            return;
+        }
+        try {
+            // TODO
+            // JWT 적용 후 userId는 토큰에서 가져오기
+            const userId = "creator1";
+            await removeProject(
+                projectId,
+                userId
+            );
+            alert("프로젝트가 삭제되었습니다.");
+            navigate("/projects");
+        } catch (e) {
+            console.error(e);
+            alert("삭제 실패");
+        }
+    };
 
     if (loading) {
         return (
@@ -61,15 +84,15 @@ function ProjectDetailPage() {
             </p>
             <p>
                 목표 금액 :
-                {project.targetAmount.toLocaleString()}원
+                {Number(project.targetAmount).toLocaleString()}원
             </p>
             <p>
                 시작일 :
-                {project.startDate}
+                {new Date(project.startDate).toLocaleDateString("ko-KR")}
             </p>
             <p>
                 종료일 :
-                {project.endDate}
+                {new Date(project.endDate).toLocaleDateString("ko-KR")}
             </p>
             <p>
                 상태 :
@@ -81,6 +104,21 @@ function ProjectDetailPage() {
                     __html: project.contentHtml
                 }}
             />
+            <hr />
+            <div className="ProjectDetailBtn">
+                <button className="ProjectDetailEditBtn"
+                    onClick={() =>
+                        navigate(`/projects/${projectId}/edit`)
+                    }
+                >
+                    수정
+                </button>
+                <button
+                    onClick={handleDelete}
+                >
+                    삭제
+                </button>
+            </div>
         </div>
     );
 }

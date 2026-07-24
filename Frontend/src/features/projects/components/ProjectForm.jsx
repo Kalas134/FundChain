@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 
 function ProjectForm({
     initialData,
-    onSubmit
+    onSubmit,
+    submitText = "저장"
 }) {
 
     const [formData, setFormData] = useState({
@@ -120,7 +121,7 @@ function ProjectForm({
                 />
             </div>
             <button type="submit">
-                저장
+                {submitText}
             </button>
         </form>
     );
