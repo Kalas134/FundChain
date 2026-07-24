@@ -4,7 +4,7 @@ import api from "../../../services/api";
 
 export const getProjects = async () => {
     const response = await api.get(
-        "/api/projects"
+        "/projects"
     );
     return response.data;
 };
@@ -13,7 +13,7 @@ export const getProjects = async () => {
 
 export const getProject = async(projectId) => {
     const response = await api.get(
-        `/api/projects/${projectId}`
+        `/projects/${projectId}`
     );
     return response.data;
 };
@@ -25,7 +25,7 @@ export const createProject = async (
     creatorId
 ) => {
     const response = await api.post(
-        `/api/projects?creatorId=${creatorId}`,
+        `/projects?creatorId=${creatorId}`,
         projectData
     );
     return response.data;
@@ -39,7 +39,7 @@ export const updateProject = async (
     userId
 ) => {
     const response = await api.put(
-        `/api/projects/${projectId}?userId=${userId}`,
+        `/projects/${projectId}?userId=${userId}`,
         projectData
     );
     return response.data;
@@ -52,6 +52,6 @@ export const deleteProject = async (
     userId
 ) => {
     await api.delete(
-        `/api/projects/${projectId}?userId=${userId}`
+        `/projects/${projectId}?userId=${userId}`
     );
 };

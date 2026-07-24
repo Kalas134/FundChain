@@ -16,50 +16,108 @@ function ProjectForm({
     });
 
     /**
-     * 수정 페이지인 경우 기존 데이터 반영
+     * 수정 데이터 반영
      */
     useEffect(() => {
-
         if (initialData) {
             setFormData({
-                title: initialData.title || "",
-                thumbnailImage: initialData.thumbnailImage || "",
-                targetAmount: initialData.targetAmount || "",
-                startDate: initialData.startDate || "",
-                endDate: initialData.endDate || "",
-                contentHtml: initialData.contentHtml || ""
+                title:
+                    initialData.title || "",
+                thumbnailImage:
+                    initialData.thumbnailImage || "",
+                targetAmount:
+                    initialData.targetAmount || "",
+                startDate:
+                    formatDateTime(initialData.startDate),
+                endDate:
+                    formatDateTime(initialData.endDate),
+                contentHtml:
+                    removeHtmlTag(
+                        initialData.contentHtml
+                    )
             });
+
         }
     }, [initialData]);
 
     /**
-     * 입력값 변경
+     * 날짜 변환
+     * 
+     * 2026-08-01T00:00:00Z
+     * ↓
+     * 2026-08-01T00:00
+     */
+    const formatDateTime = (date) => {
+        if (!date) {
+            return "";
+        }
+        return date.substring(0,16);
+    };
+
+    /**
+     * HTML 태그 제거
+     *
+     * <p>내용</p>
+     * ↓
+     * 내용
+     */
+    const removeHtmlTag = (html) => {
+        if (!html) {
+            return "";
+        }
+        return html.replace(
+            /<[^>]*>/g,
+            ""
+        );
+    };
+
+    /**
+     * 입력 변경
      */
     const handleChange = (e) => {
         const {
             name,
             value
         } = e.target;
-        setFormData((prev) => ({
+        setFormData((prev)=>({
+
             ...prev,
-            [name]: value
+            [name]:value
+
         }));
+
     };
 
     /**
      * 제출
      */
-    const handleSubmit = (e) => {
+    const handleSubmit = (e)=>{
         e.preventDefault();
-        if (onSubmit) {
-            onSubmit(formData);
+        if(onSubmit){
+            onSubmit({
+                ...formData,
+                // 백엔드용 ISO 변환
+                startDate:
+                    new Date(
+                        formData.startDate
+                    ).toISOString(),
+                endDate:
+                    new Date(
+                        formData.endDate
+                    ).toISOString(),
+                // HTML 저장 형태 유지
+                contentHtml:
+                    `<p>${formData.contentHtml}</p>`
+            });
         }
     };
 
     return (
         <form onSubmit={handleSubmit}>
             <div>
-                <label>프로젝트 제목</label>
+                <label>
+                    프로젝트 제목
+                </label>
                 <input
                     type="text"
                     name="title"
@@ -68,8 +126,11 @@ function ProjectForm({
                     required
                 />
             </div>
+
             <div>
-                <label>썸네일 이미지 URL</label>
+                <label>
+                    썸네일 이미지 URL
+                </label>
                 <input
                     type="text"
                     name="thumbnailImage"
@@ -77,9 +138,11 @@ function ProjectForm({
                     onChange={handleChange}
                 />
             </div>
-            <div>
-                <label>목표 금액</label>
 
+            <div>
+                <label>
+                    목표 금액
+                </label>
                 <input
                     type="number"
                     name="targetAmount"
@@ -88,9 +151,11 @@ function ProjectForm({
                     required
                 />
             </div>
-            <div>
-                <label>시작일</label>
 
+            <div>
+                <label>
+                    시작일
+                </label>
                 <input
                     type="datetime-local"
                     name="startDate"
@@ -99,9 +164,11 @@ function ProjectForm({
                     required
                 />
             </div>
-            <div>
-                <label>종료일</label>
 
+            <div>
+                <label>
+                    종료일
+                </label>
                 <input
                     type="datetime-local"
                     name="endDate"
@@ -110,8 +177,11 @@ function ProjectForm({
                     required
                 />
             </div>
+
             <div>
-                <label>프로젝트 내용</label>
+                <label>
+                    프로젝트 내용
+                </label>
                 <textarea
                     name="contentHtml"
                     rows="10"
@@ -120,6 +190,7 @@ function ProjectForm({
                     required
                 />
             </div>
+
             <button type="submit">
                 {submitText}
             </button>

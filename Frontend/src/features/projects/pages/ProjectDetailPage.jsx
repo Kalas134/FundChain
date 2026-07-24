@@ -28,7 +28,7 @@ function ProjectDetailPage() {
         try {
             // TODO
             // JWT 적용 후 userId는 토큰에서 가져오기
-            const userId = "creator1";
+            const userId = localStorage.getItem("userId");
             await removeProject(
                 projectId,
                 userId
