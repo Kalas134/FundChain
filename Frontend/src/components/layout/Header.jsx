@@ -16,7 +16,10 @@ function Header() {
 
         CREATOR: (
             <>
-                <Link to="/projects/create">
+                <Link 
+                    to="/projects/create"
+                    className="header-action-btn"
+                >
                     프로젝트 올리기
                 </Link>
             </>
@@ -24,7 +27,10 @@ function Header() {
 
         ADMIN: (
             <>
-                <Link to="/admin">
+                <Link 
+                    to="/admin"
+                    className="header-action-btn"
+                >
                     관리자 페이지
                 </Link>
             </>

@@ -1,13 +1,28 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { NavLink } from "react-router-dom";
 
 function Navigation() {
     return (
-        <div className="navigation">
-            <h2><Link to={"/"}>홈</Link>{" | "}
-            <Link to={"/AboutPage"}>소개</Link>{" | "}
-            <Link to={"#"}>프로젝트</Link>{" | "}</h2>
-        </div>
+        <nav className="navigation">
+            <NavLink
+                to="/"
+                className="navigation-link"
+            >
+                홈
+            </NavLink>
+            <NavLink
+                to="/AboutPage"
+                className="navigation-link"
+            >
+                소개
+            </NavLink>
+            <NavLink
+                to="#"
+                className="navigation-link"
+            >
+                프로젝트
+            </NavLink>
+        </nav>
     );
 }
 
