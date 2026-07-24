@@ -32,11 +32,18 @@ function LoginForm() {
             console.log("로그인 성공 : ", response);
 
             const token = response.token || response.accessToken;
+            // JWT Access Token 저장
             if (token) {
                 localStorage.setItem("accessToken", token);
             }
+            // 사용자 권한 저장
             if (response.userRole) {
                 localStorage.setItem("userRole", response.userRole);
+            }
+            // 사용자 ID 저장
+            if (response.userId) {
+                localStorage.setItem("userId", response.userId
+                );
             }
 
             alert("로그인 성공");
