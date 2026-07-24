@@ -4,6 +4,7 @@ import com.fundchain.project.dto.ProjectCreateRequest;
 import com.fundchain.project.dto.ProjectResponse;
 import com.fundchain.project.dto.ProjectUpdateRequest;
 import com.fundchain.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@Tag(name = "프로젝트 API", description = "프로젝트 CRUD")
 @RestController
 @RequestMapping("/api/projects")
 @RequiredArgsConstructor

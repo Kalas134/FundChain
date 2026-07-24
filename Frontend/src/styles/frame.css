@@ -56,3 +56,109 @@
     margin-top: 8px;
     flex-direction: row;
 }
+
+.ProjectDetailBtn {
+    margin-top: 20px ;
+}
+
+.ProjectDetailEditBtn {
+    margin-right: 10px;
+}
+
+/* ===========================
+   Project Form
+=========================== */
+
+
+.project-form {
+    width: 700px;
+    margin: 40px auto;
+    padding: 40px;
+    background: white;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+/* 입력 하나의 영역 */
+.project-form-group {
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+/* Label */
+.project-form-group label {
+    color:var(--text-h);
+    font-size:16px;
+    font-weight:600;
+}
+
+/* Input */
+.project-form-group input,
+.project-form-group textarea {
+    width:100%;
+    box-sizing:border-box;
+    padding:12px 14px;
+    border:
+        1px solid var(--border);
+    border-radius:8px;
+    background:white;
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:15px;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+
+}
+
+.project-form-group input:focus,
+.project-form-group textarea:focus {
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:
+        0 0 0 3px var(--accent-bg);
+}
+
+/* 날짜 영역 */
+.project-form-date-group {
+    display:flex;
+    gap:20px;
+}
+
+.project-form-date-group
+.project-form-group {
+    flex:1;
+}
+
+/* 내용 textarea */
+.project-form-group textarea {
+    min-height:220px;
+    resize:none;
+}
+
+/* 제출 버튼 */
+.project-submit-btn {
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:
+        var(--primary-btn);
+    color:
+        var(--btn-text);
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:
+        opacity 0.2s;
+}
+
+.project-submit-btn:hover {
+    opacity:0.9;
+}

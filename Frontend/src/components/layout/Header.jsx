@@ -16,7 +16,7 @@ function Header() {
 
         CREATOR: (
             <>
-                <Link to="/project/register">
+                <Link to="/projects/create">
                     프로젝트 올리기
                 </Link>
             </>
