@@ -1,0 +1,9 @@
+public/images/projects/project-101.jpg
+
+이런 형식으로 넣을 것 이미지 이름은 목업 파일 내 경로 참조
+
+/public/images/projects/default-project.jpg
+
+반드시 필요
+
+이미지 파일 확장자가 다를 경우, 이에 맞추어서 교환
