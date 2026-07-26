@@ -70,6 +70,11 @@ function ProjectListPage() {
 
         status: project.status,
 
+        // 추가: 해당 데이터가 목업 프로젝트임을 표시
+        // ProjectCard에서 목업/DB 프로젝트를 구분하여
+        // 상태 표시 방식을 다르게 처리할 때 사용한다.
+        isMock: true,
+
         // 목업의 description을 상세 내용처럼 사용
         contentHtml: `<p>${project.description}</p>`
     }));

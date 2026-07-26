@@ -66,7 +66,7 @@ export const mockCreatorProjects = [
     {
         id: 101,
         // 수정: 임시 이미지 파일을 public 폴더에서 불러옴
-        imageUrl: "/images/projects/project-101.jpg",
+        imageUrl: "/images/projects/101/project-101.jpg",
         createdDate: "2023. 04. 15 생성",
         title: "스마트 홈 IoT 가젯 프로젝트",
         description: "쉽고 빠르게 구축하는 차세대 스마트홈 허브 및 센서 패키지",
@@ -79,7 +79,7 @@ export const mockCreatorProjects = [
     {
         id: 102,
         // 수정
-        imageUrl: "/images/projects/project-102.jpg",
+        imageUrl: "/images/projects/102/project-102.jpg",
         createdDate: "2023. 01. 10 생성",
         title: "친환경 비건 텀블러 & 오가닉 백",
         description: "지구를 살리는 지속 가능한 친환경 텀블러 디자인 프로젝트",
@@ -92,7 +92,7 @@ export const mockCreatorProjects = [
     {
         id: 103,
         // 수정
-        imageUrl: "/images/projects/project-103.jpg",
+        imageUrl: "/images/projects/103/project-103.jpg",
         createdDate: "2023. 06. 01 생성",
         title: "초고음질 블루투스 수제 헤드폰",
         description: "장인의 손길로 제작하는 최고급 원목 하우징 수제 헤드폰",
@@ -105,7 +105,7 @@ export const mockCreatorProjects = [
     {
         id: 104,
         // 수정
-        imageUrl: "/images/projects/project-104.jpg",
+        imageUrl: "/images/projects/104/project-104.jpg",
         createdDate: "2022. 09. 12 생성",
         title: "아날로그 필름 감성 미니 카메라",
         description: "포켓 사이즈로 즐기는 독창적인 레트로 필름 카메라",

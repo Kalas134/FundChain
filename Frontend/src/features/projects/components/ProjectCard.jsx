@@ -47,9 +47,10 @@ function ProjectCard({ project }) {
 
     if (project.isMock) {
 
-        // 추가: 목업 데이터는 실제 DB status를 사용하지 않는다.
-        // 현재는 임시 테스트용으로 진행중 상태로 표시한다.
-        projectStatus = "진행중";
+        // 추가: 목업 데이터는 실제 DB status를 사용한다.
+        // 목업도 PREPARING / ONGOING / SUCCESS / FAILED
+        // 상태값을 그대로 상태 배지에 표시한다.
+        projectStatus = project.status;
 
     } else {
 
@@ -70,6 +71,24 @@ function ProjectCard({ project }) {
             showDeadline = true;
         }
     }
+
+
+    // ============================================================
+    // 추가: 프로젝트 상태별 화면 표시 설정
+    //
+    // 기존 "오늘 마감" 위치에 상태 배지를 표시한다.
+    //
+    // PREPARING은 ProjectCard 위에서 이미 return null 처리되므로
+    // 여기에서는 ONGOING / SUCCESS / FAILED만 실제로 표시된다.
+    // ============================================================
+    const STATUS_CONFIG = {
+        PREPARING: { label: '준비중', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300' },
+        ONGOING: { label: '진행중', badgeClass: 'bg-blue-100 text-blue-800 border-blue-300' },
+        SUCCESS: { label: '성공', badgeClass: 'bg-accent/15 text-accent font-bold border-accent/40' },
+        FAILED: { label: '실패', badgeClass: 'bg-warning/15 text-warning font-bold border-warning/40' }
+    };
+
+    const statusInfo = STATUS_CONFIG[projectStatus];
 
 
     return (
@@ -98,8 +117,25 @@ function ProjectCard({ project }) {
                     }}
                 />
 
-                {/* 수정: 항상 "오늘 마감"을 표시하지 않고
-                    실제 프로젝트 상태에 따라서 표시 */}
+                {/* 수정:
+                    기존 "오늘 마감" 대신 프로젝트 상태를 표시한다.
+                    상태값에 대응하는 색상과 라벨을 함께 표시한다.
+                */}
+                {
+                    statusInfo && (
+                        <span
+                            className={`project-card-deadline border ${statusInfo.className}`}
+                        >
+                            {statusInfo.label}
+                        </span>
+                    )
+                }
+
+                {/* 추가:
+                    DB에서 별도로 마감 상태로 판단되는 경우
+                    기존 "오늘 마감" 표시를 유지한다.
+                    단, 상태 배지와 겹치지 않도록 별도로 표시한다.
+                */}
                 {
                     showDeadline && (
                         <span className="project-card-deadline">
@@ -121,10 +157,13 @@ function ProjectCard({ project }) {
                     {project.description}
                 </p>
 
-                {/* 추가: 프로젝트 상태 표시 */}
-                <p className="project-card-status">
-                    상태 : {projectStatus}
-                </p>
+                {/* 수정:
+                    기존의
+                    "상태 : 진행중"
+                    텍스트는 제거한다.
+
+                    상태는 썸네일 영역의 상태 배지로 표시한다.
+                */}
 
             </div>
 

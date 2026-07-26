@@ -141,6 +141,52 @@ function ProjectDetailPage() {
     const endDate = new Date(displayProject.endDate);
     const today = new Date();
 
+
+    // ============================================================
+    // 추가: 프로젝트 상태 표시
+    //
+    // 목록 카드(ProjectCard)와 동일하게 DB/목업의 status 값을 사용한다.
+    //
+    // PREPARING → 준비중
+    // ONGOING   → 진행중
+    // SUCCESS   → 성공
+    // FAILED    → 실패
+    //
+    // status가 없거나 알 수 없는 값이면 "상태 확인중"으로 표시한다.
+    // ============================================================
+    const STATUS_CONFIG = {
+        PREPARING: {
+            label: "준비중",
+            className: "status-preparing"
+        },
+        ONGOING: {
+            label: "진행중",
+            className: "status-ongoing"
+        },
+        SUCCESS: {
+            label: "성공",
+            className: "status-success"
+        },
+        FAILED: {
+            label: "실패",
+            className: "status-failed"
+        }
+    };
+
+
+    const statusInfo =
+        STATUS_CONFIG[displayProject.status] || {
+            label: "상태 확인중",
+            className: "status-unknown"
+        };
+
+
+    // ============================================================
+    // 추가: 실제 날짜 기준 마감 여부
+    //
+    // 기존 코드의 날짜 계산은 그대로 유지한다.
+    // 다만 상태 표시와는 별개의 값으로 사용한다.
+    // ============================================================
     const isEnded = today > endDate;
 
 
@@ -170,17 +216,23 @@ function ProjectDetailPage() {
                 {/* 프로젝트 기본 정보 */}
                 <section className="ProjectDetailInfo">
 
-                    <div className="ProjectDetailStatus">
-                        {isEnded ? "마감" : "진행중"}
+                    {/* 수정: 날짜 기준 "마감/진행중" 대신 DB/목업 status를 표시 */}
+                    <div
+                        className={`ProjectDetailStatus ${statusInfo.className}`}
+                    >
+                        {statusInfo.label}
                     </div>
+
 
                     <h1 className="ProjectDetailTitle">
                         {displayProject.title}
                     </h1>
 
+
                     <div className="ProjectDetailCreator">
                         작성자&nbsp; {displayProject.creatorId}
                     </div>
+
 
                     <div className="ProjectDetailAmount">
 
@@ -221,13 +273,24 @@ function ProjectDetailPage() {
                     </div>
 
 
+                    {/* 수정: 상태에 따라 펀딩 버튼 동작 변경 */}
                     <button
                         className="ProjectDetailFundingBtn"
-                        disabled={isEnded}
+                        disabled={
+                            displayProject.status !== "ONGOING" ||
+                            isEnded
+                        }
                     >
-                        {isEnded
-                            ? "마감된 프로젝트"
-                            : "펀딩하기"
+                        {
+                            displayProject.status === "PREPARING"
+                                ? "준비중인 프로젝트"
+                                : displayProject.status === "SUCCESS"
+                                    ? "성공한 프로젝트"
+                                    : displayProject.status === "FAILED"
+                                        ? "실패한 프로젝트"
+                                        : isEnded
+                                            ? "마감된 프로젝트"
+                                            : "펀딩하기"
                         }
                     </button>
 
