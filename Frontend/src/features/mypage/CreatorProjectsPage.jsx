@@ -54,10 +54,25 @@ const CreatorProjectsPage = () => {
                 // setProjectsList(data || []);
 
                 // 기존 목업 데이터에 DB 프로젝트 추가
-                setProjectsList(prev => [
-                    ...prev,
-                    ...(data || [])
-                ]);
+                // setProjectsList(prev => [
+                //     ...prev,
+                //     ...(data || [])
+                // ]);
+                // 수정: 동일한 DB 프로젝트가 이미 목록에 존재하면 추가하지 않음
+                setProjectsList(prev => {
+                    const existingIds = new Set(
+                        prev.map(project => project.projectId ?? project.id)
+                    );
+
+                    const newProjects = (data || []).filter(
+                        project => !existingIds.has(project.projectId ?? project.id)
+                    );
+
+                    return [
+                        ...prev,
+                        ...newProjects
+                    ];
+                });
 
             } catch (error) {
                 console.error("내 프로젝트 조회 실패:", error);
@@ -117,13 +132,26 @@ const CreatorProjectsPage = () => {
 
     // 카드 클릭시 프로젝트 상세 페이지로 이동
     const handleCardClick = (projectId) => {
-        navigate(`/project/${projectId}`);
+        navigate(`/projects/${projectId}`);
     };
 
     // 프로젝트 수정 핸들러
-    const handleEditProject = (e, projectId) => {
+    const handleEditProject = (e, project) => {
         e.stopPropagation(); // 카드 전체 클릭 이벤트 전파 방지
-        navigate(`/project/edit/${projectId}`);
+
+        // 추가: 준비중(PREPARING) 상태의 프로젝트만 수정 가능
+        if (project.status !== 'PREPARING') {
+            return;
+        }
+
+        // 수정: 기존 /project/edit 경로를
+        // 실제 프로젝트 기능에서 사용하는 /projects/edit 구조로 변경
+        //
+        // DB 프로젝트는 projectId를 사용하고,
+        // 목업 프로젝트는 id를 사용하도록 대응
+        const projectId = project.projectId ?? project.id;
+
+        navigate(`/projects/${projectId}/edit`);
     };
 
     // 프로젝트 삭제 핸들러
@@ -233,8 +261,12 @@ const CreatorProjectsPage = () => {
                             ? Math.round((project.currentAmount / project.targetAmount) * 100)
                             : 0;
 
+                        // 추가: 준비중 상태인지 확인
+                        // 준비중인 프로젝트만 수정할 수 있도록 한다.
+                        const isEditable = project.status === 'PREPARING';
+
                         return (
-                            <div key={project.id} className="w-full">
+                            <div key={project.projectId ?? project.id} className="w-full">
                                 {/* 프로젝트 상태 헤더 라벨 */}
                                 <div className="flex items-center gap-2 mb-3 mx-4">
                                     <h3 className="text-lg font-bold text-gray-900">
@@ -247,7 +279,7 @@ const CreatorProjectsPage = () => {
 
                                 {/* 카드 전체 클릭시 상세페이지 이동 */}
                                 <div
-                                    onClick={() => handleCardClick(project.id)}
+                                    onClick={() => handleCardClick(project.projectId ?? project.id)}
                                     className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                                 >
                                     <div className="relative flex p-6 items-start">
@@ -300,12 +332,22 @@ const CreatorProjectsPage = () => {
 
                                     {/* 하단 액션 버튼 그룹 (프로젝트 수정, 프로젝트 삭제 - 2개 버튼 1:1 넓이) */}
                                     <div className="flex border-t border-gray-100 p-3 px-6 gap-3">
+
+                                        {/* 수정: PREPARING 상태일 때만 수정 버튼 활성화 */}
                                         <button
-                                            onClick={(e) => handleEditProject(e, project.id)}
-                                            className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors"
+                                            type="button"
+                                            onClick={(e) => handleEditProject(e, project)}
+                                            disabled={!isEditable}
+                                            className={`flex-1 py-2.5 rounded text-sm font-semibold text-center transition-colors
+                                                ${
+                                                    isEditable
+                                                        ? 'border border-accent text-accent hover:bg-accent/10 cursor-pointer'
+                                                        : 'border border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed'
+                                                }`}
                                         >
                                             프로젝트 수정
                                         </button>
+
                                         <button
                                             onClick={(e) => handleDeleteProject(e, project.id)}
                                             className="flex-1 py-2.5 border border-warning/40 text-warning rounded text-sm font-semibold text-center hover:bg-warning/10 transition-colors"
