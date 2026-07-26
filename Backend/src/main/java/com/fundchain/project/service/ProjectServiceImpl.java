@@ -90,6 +90,20 @@ public class ProjectServiceImpl implements ProjectService {
                 .toList();
     }
 
+    /**
+     * 크리에이터의 프로젝트 목록 조회
+     */
+    @Override
+    public List<ProjectResponse> getProjectsByCreator(
+            String creatorId
+    ) {
+
+        return projectRepository
+                .findByCreator_UserId(creatorId)
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
 
     /**
      * 프로젝트 상세 조회

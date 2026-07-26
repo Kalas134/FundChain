@@ -76,7 +76,23 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * 특정 크리에이터의 프로젝트 목록 조회
+     *
+     * GET /api/projects/creator/{creatorId}
+     */
+    @GetMapping("/creator/{creatorId}")
+    public ResponseEntity<List<ProjectResponse>> getProjectsByCreator(
+            @PathVariable String creatorId
+    ) {
 
+        List<ProjectResponse> response =
+                projectService.getProjectsByCreator(
+                        creatorId
+                );
+
+        return ResponseEntity.ok(response);
+    }
 
     /**
      * 프로젝트 상세 조회

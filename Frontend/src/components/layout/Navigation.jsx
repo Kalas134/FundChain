@@ -17,7 +17,7 @@ function Navigation() {
                 소개
             </NavLink>
             <NavLink
-                to="#"
+                to="/projects"
                 className="navigation-link"
             >
                 프로젝트

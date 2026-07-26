@@ -18,6 +18,18 @@ export const getProject = async(projectId) => {
     return response.data;
 };
 
+// 크리에이터의 프로젝트 조회
+
+export const getProjectsByCreator = async (
+    creatorId
+) => {
+    const response = await api.get(
+        `/projects/creator/${creatorId}`
+    );
+
+    return response.data;
+};
+
 // 프로젝트 등록
 
 export const createProject = async (

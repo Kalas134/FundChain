@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockCreatorProjects } from './mockData';
+import { mockCreatorProjects } from './mockData'; // 목업데이터
+import { getMyProjects } from './services/myPageApi';
 
 /**
  * 프로젝트 상태 매핑 (라벨, 배지 스타일)
@@ -21,6 +22,7 @@ const CreatorProjectsPage = () => {
 
     // 프로젝트 목록 상태 관리 (삭제 기능 테스트 지원)
     const [projectsList, setProjectsList] = useState(mockCreatorProjects);
+    // const [projectsList, setProjectsList] = useState([]);
 
     // 프로젝트 검색어 상태
     const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +33,39 @@ const CreatorProjectsPage = () => {
     // 선택된 조회 연도 및 월 필터
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
+
+    useEffect(() => {
+        const loadMyProjects = async () => {
+            try {
+                const userId = localStorage.getItem("userId");
+
+                if (!userId) {
+                    return;
+                }
+
+                const data = await getMyProjects(userId);
+
+                // 목업데이터 용
+                // if (data && data.length > 0) {
+                //     setProjectsList(data);
+                // }
+
+                // 크리에이터 프로젝트만 부르는 용도 
+                // setProjectsList(data || []);
+
+                // 기존 목업 데이터에 DB 프로젝트 추가
+                setProjectsList(prev => [
+                    ...prev,
+                    ...(data || [])
+                ]);
+
+            } catch (error) {
+                console.error("내 프로젝트 조회 실패:", error);
+            }
+        };
+
+        loadMyProjects();
+    }, []);
 
     // 1. 상태별 프로젝트 개수 계산
     const totalCount = projectsList.length;

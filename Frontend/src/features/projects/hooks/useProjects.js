@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 
 import {
     getProjects,
+    getProjectsByCreator,
     getProject,
     createProject,
     updateProject,
@@ -25,7 +26,12 @@ const useProjects = () => {
 
 
     /**
-     * 프로젝트 목록 조회
+     * 프로젝트 전체 목록 조회
+     *
+     * GET /api/projects
+     *
+     * 로그인 사용자와 관계없이
+     * 모든 프로젝트를 조회할 때 사용
      */
     const fetchProjects = useCallback(
         async () => {
@@ -58,7 +64,58 @@ const useProjects = () => {
 
 
     /**
+     * 로그인한 크리에이터의 프로젝트 목록 조회
+     *
+     * GET /api/projects/creator/{creatorId}
+     *
+     * localStorage에 저장된 userId를 사용하여
+     * 현재 로그인한 사용자가 만든 프로젝트만 조회
+     */
+    const fetchMyProjects = useCallback(
+        async () => {
+
+            try {
+
+                setLoading(true);
+                setError(null);
+
+                // localStorage에서 현재 로그인 사용자 ID 조회
+                const userId = localStorage.getItem("userId");
+
+                if (!userId) {
+                    throw new Error(
+                        "로그인 사용자 정보가 없습니다."
+                    );
+                }
+
+                // 현재 로그인한 사용자의 프로젝트만 조회
+                const data = await getProjectsByCreator(userId);
+
+                setProjects(data);
+
+            } catch (err) {
+
+                setError(
+                    err.response?.data ||
+                    err.message ||
+                    "내 프로젝트 목록 조회 실패"
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        },
+        []
+    );
+
+
+    /**
      * 프로젝트 상세 조회
+     *
+     * GET /api/projects/{projectId}
      */
     const fetchProject = useCallback(
         async (
@@ -96,6 +153,8 @@ const useProjects = () => {
 
     /**
      * 프로젝트 등록
+     *
+     * POST /api/projects?creatorId={creatorId}
      */
     const addProject = useCallback(
         async (
@@ -137,6 +196,8 @@ const useProjects = () => {
 
     /**
      * 프로젝트 수정
+     *
+     * PUT /api/projects/{projectId}?userId={userId}
      */
     const editProject = useCallback(
         async (
@@ -180,6 +241,8 @@ const useProjects = () => {
 
     /**
      * 프로젝트 삭제
+     *
+     * DELETE /api/projects/{projectId}?userId={userId}
      */
     const removeProject = useCallback(
         async (
@@ -228,6 +291,7 @@ const useProjects = () => {
 
         // methods
         fetchProjects,
+        fetchMyProjects,
         fetchProject,
         addProject,
         editProject,

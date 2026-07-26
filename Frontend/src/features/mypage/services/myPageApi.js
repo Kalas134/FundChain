@@ -18,3 +18,25 @@ export const updateMyPageInfo = async (updateData) => {
     const response = await api.put('/mypage/me', updateData);
     return response.data;
 };
+
+/**
+ * 크리에이터 프로젝트 목록 조회 API
+ * GET /api/mypage/myprojects ==> 기존 충영씨가 만든것
+ * GET /api/projects/creator/{creatorId}
+ */
+export const getMyProjects = async (creatorId) => {
+    const response = await api.get(`/projects/creator/${creatorId}`);
+
+    return response.data.map(project => ({
+        id: project.projectId,
+        imageUrl: project.thumbnailImage,
+        createdDate: project.startDate,
+        title: project.title,
+        description: project.contentHtml || '',
+        currentAmount: 0, // 임시값 알맞는 값으로 전환 바람
+        targetAmount: Number(project.targetAmount),
+        status: project.status,
+        year: new Date(project.startDate).getFullYear(),
+        month: new Date(project.startDate).getMonth() + 1
+    }));
+};

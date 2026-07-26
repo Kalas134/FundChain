@@ -28,6 +28,14 @@ public interface ProjectService {
      */
     List<ProjectResponse> getProjects();
 
+    /**
+     *  크리에이터의 프로젝트 목록 조회
+     *
+     * @return 크리에이터 프로젝트 정보
+     */
+    List<ProjectResponse> getProjectsByCreator(
+            String creatorId
+    );
 
     /**
      * 프로젝트 상세 조회
@@ -63,4 +71,5 @@ public interface ProjectService {
             Long projectId,
             String userId
     );
+
 }
