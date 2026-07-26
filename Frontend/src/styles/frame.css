@@ -332,41 +332,6 @@
 }
 
 
-/* 프로젝트 상태 - 준비중 */
-.status-preparing {
-    color: #92400E;
-    background-color: #FEF3C7;
-    border: 1px solid #F59E0B;
-}
-
-/* 프로젝트 상태 - 진행중 */
-.status-ongoing {
-    color: #1D4ED8;
-    background-color: #DBEAFE;
-    border: 1px solid #3B82F6;
-}
-
-/* 프로젝트 상태 - 성공 */
-.status-success {
-    color: #00A98F;
-    background-color: rgba(0, 212, 178, 0.15);
-    border: 1px solid rgba(0, 212, 178, 0.4);
-}
-
-/* 프로젝트 상태 - 실패 */
-.status-failed {
-    color: #E04463;
-    background-color: rgba(255, 101, 132, 0.15);
-    border: 1px solid rgba(255, 101, 132, 0.4);
-}
-
-/* 알 수 없는 상태 */
-.status-unknown {
-    color: #374151;
-    background-color: #F3F4F6;
-    border: 1px solid #D1D5DB;
-}
-
 /* =========================
    로딩 / 에러
 ========================= */
