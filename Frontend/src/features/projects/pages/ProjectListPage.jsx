@@ -55,7 +55,7 @@ function ProjectListPage() {
     // 따라서 두 데이터를 같은 구조로 맞춰준다.
     // ============================================================
     const mockProjects = mockCreatorProjects.map((project) => ({
-        projectId: project.id,
+        projectId: project.projectId,
         creatorId: "mock-creator",
         title: project.title,
         thumbnailImage: project.imageUrl,

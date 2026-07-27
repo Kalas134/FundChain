@@ -52,7 +52,7 @@ function ProjectDetailPage() {
                 const itemProjectId =
                     item.projectId ?? item.id;
 
-                return String(itemProjectId) === String(projectId);
+                return String(item.projectId) === String(projectId);
             }
         );
         // --------------------------------------------------------

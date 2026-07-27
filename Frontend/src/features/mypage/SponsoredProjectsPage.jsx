@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { mockProjects } from './mockData';
 import { getSponsoredProjects } from './services/myPageApi';
 
@@ -6,6 +7,7 @@ import { getSponsoredProjects } from './services/myPageApi';
  * 사용자가 후원한 프로젝트 목록을 조회하고 필터링/검색할 수 있는 마이페이지 메인 화면 컴포넌트
  */
 const SponsoredProjectsPage = () => {
+    const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
