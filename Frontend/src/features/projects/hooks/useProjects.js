@@ -24,7 +24,6 @@ const useProjects = () => {
     // 에러 상태
     const [error, setError] = useState(null);
 
-
     /**
      * 프로젝트 전체 목록 조회
      *
@@ -35,33 +34,22 @@ const useProjects = () => {
      */
     const fetchProjects = useCallback(
         async () => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 const data = await getProjects();
-
                 setProjects(data);
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     "프로젝트 목록 조회 실패"
                 );
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
-
 
     /**
      * 로그인한 크리에이터의 프로젝트 목록 조회
@@ -73,44 +61,31 @@ const useProjects = () => {
      */
     const fetchMyProjects = useCallback(
         async () => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 // localStorage에서 현재 로그인 사용자 ID 조회
                 const userId = localStorage.getItem("userId");
-
                 if (!userId) {
                     throw new Error(
                         "로그인 사용자 정보가 없습니다."
                     );
                 }
-
                 // 현재 로그인한 사용자의 프로젝트만 조회
                 const data = await getProjectsByCreator(userId);
-
                 setProjects(data);
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     err.message ||
                     "내 프로젝트 목록 조회 실패"
                 );
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
-
 
     /**
      * 프로젝트 상세 조회
@@ -121,35 +96,24 @@ const useProjects = () => {
         async (
             projectId
         ) => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 const data = await getProject(
                     projectId
                 );
-
                 setProject(data);
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     "프로젝트 조회 실패"
                 );
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
-
 
     /**
      * 프로젝트 등록
@@ -161,38 +125,26 @@ const useProjects = () => {
             projectData,
             creatorId
         ) => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 const data = await createProject(
                     projectData,
                     creatorId
                 );
-
                 return data;
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     "프로젝트 등록 실패"
                 );
-
                 throw err;
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
-
 
     /**
      * 프로젝트 수정
@@ -205,39 +157,27 @@ const useProjects = () => {
             projectData,
             userId
         ) => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 const data = await updateProject(
                     projectId,
                     projectData,
                     userId
                 );
-
                 return data;
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     "프로젝트 수정 실패"
                 );
-
                 throw err;
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
-
 
     /**
      * 프로젝트 삭제
@@ -249,45 +189,32 @@ const useProjects = () => {
             projectId,
             userId
         ) => {
-
             try {
-
                 setLoading(true);
                 setError(null);
-
                 await deleteProject(
                     projectId,
                     userId
                 );
-
             } catch (err) {
-
                 setError(
                     err.response?.data ||
                     "프로젝트 삭제 실패"
                 );
-
                 throw err;
-
             } finally {
-
                 setLoading(false);
-
             }
-
         },
         []
     );
 
-
     return {
-
         // state
         projects,
         project,
         loading,
         error,
-
 
         // methods
         fetchProjects,
@@ -296,7 +223,6 @@ const useProjects = () => {
         addProject,
         editProject,
         removeProject
-
     };
 };
 

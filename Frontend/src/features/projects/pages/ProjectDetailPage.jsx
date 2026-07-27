@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import useProjects from "../hooks/useProjects";
 import "../../../styles/frame.css";
 import { mockCreatorProjects } from "../../mypage/mockData";
 import { supportProject } from "../../mypage/services/myPageApi";
 
-
 function ProjectDetailPage() {
-
+    // ============================================================
+    // 1. Router Hook
+    // ============================================================
     const { projectId } = useParams();
+    const navigate = useNavigate();
 
-    // 추가: 목업 프로젝트 상세 데이터를 저장하기 위한 state
-    const [mockProject, setMockProject] = useState(null);
-
-
+    // ============================================================
+    // 2. 프로젝트 조회 Hook
+    // ============================================================
     const {
         project,
         loading,
@@ -22,136 +22,153 @@ function ProjectDetailPage() {
         fetchProject
     } = useProjects();
 
+    // ============================================================
+    // 3. 페이지에서 사용하는 모든 State
+    //
+    // 중요:
+    // 모든 Hook은 조건부 return보다 위에서 항상 동일한 순서로
+    // 호출되어야 한다.
+    // ============================================================
+    const [mockProject, setMockProject] = useState(null);
+    const [supportAmount, setSupportAmount] = useState(10000);
+    const [showSupportModal, setShowSupportModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
+    // ============================================================
+    // 4. 프로젝트 상세 조회
+    //
+    // - 목업 프로젝트라면 mockCreatorProjects에서 조회
+    // - 실제 DB 프로젝트라면 GET /api/projects/{projectId}
+    // ============================================================
     useEffect(() => {
-
-        // ============================================================
-        // 추가: 현재 projectId가 목업 프로젝트인지 먼저 확인
+        // --------------------------------------------------------
+        // 목업 프로젝트 검색
         //
-        // ProjectListPage에서 목업 프로젝트의 projectId는
-        // mockCreatorProjects의 id 값을 그대로 사용하고 있음
-        //
-        // 예:
-        // id: 101 → /projects/101
-        // id: 102 → /projects/102
-        // ============================================================
+        // mockCreatorProjects의 실제 식별자가
+        // id 또는 projectId인 경우 모두 대응
+        // --------------------------------------------------------
         const foundMockProject = mockCreatorProjects.find(
-            (item) =>
-                String(item.id) === String(projectId)
+            (item) => {
+                const itemProjectId =
+                    item.projectId ?? item.id;
+
+                return String(itemProjectId) === String(projectId);
+            }
         );
-
-
-        // ============================================================
-        // 추가: 목업 프로젝트라면 DB 조회를 하지 않고
-        // 목업 데이터를 ProjectResponse 형태로 변환
-        // ============================================================
+        // --------------------------------------------------------
+        // 목업 프로젝트인 경우
+        // --------------------------------------------------------
         if (foundMockProject) {
-
+            const mockProjectId =
+                foundMockProject.projectId ??
+                foundMockProject.id;
             setMockProject({
-                projectId: foundMockProject.id,
-                creatorId: "mock-creator",
-                title: foundMockProject.title,
-                thumbnailImage: foundMockProject.imageUrl,
-                targetAmount: foundMockProject.targetAmount,
-
-                // 추가: 프로젝트 설명
-                description: foundMockProject.description,
-
-                // 목업의 year/month를 이용해 날짜 형태를 만들어준다.
+                projectId: mockProjectId,
+                creatorId:
+                    foundMockProject.creatorId ||
+                    "mock-creator",
+                title:
+                    foundMockProject.title || "",
+                thumbnailImage:
+                    foundMockProject.imageUrl ||
+                    foundMockProject.thumbnailImage ||
+                    "",
+                targetAmount:
+                    foundMockProject.targetAmount || 0,
+                description:
+                    foundMockProject.description || "",
                 startDate:
                     `${foundMockProject.year}-${String(
                         foundMockProject.month
                     ).padStart(2, "0")}-01T00:00:00+09:00`,
-
                 endDate:
                     `${foundMockProject.year}-${String(
                         foundMockProject.month
                     ).padStart(2, "0")}-30T23:59:59+09:00`,
-
-                status: foundMockProject.status,
-
-                // 목업의 description을 상세 내용처럼 사용
+                status:
+                    foundMockProject.status,
                 contentHtml:
-                    `<p>${foundMockProject.description}</p>`
+                    `<p>${foundMockProject.description || ""}</p>`
             });
-
             return;
         }
-
-
-        // ============================================================
-        // 추가: 일반 DB 프로젝트인 경우
-        // 기존 방식 그대로 DB에서 상세 프로젝트 조회
-        // ============================================================
+        // --------------------------------------------------------
+        // 실제 DB 프로젝트인 경우
+        // --------------------------------------------------------
         setMockProject(null);
-        fetchProject(projectId);
-
+        if (projectId) {
+            fetchProject(projectId);
+        }
     }, [projectId, fetchProject]);
-
-
     // ============================================================
-    // 추가:
+    // 5. 실제 화면에 사용할 프로젝트
     //
-    // 목업 프로젝트가 존재하면 mockProject를 사용하고,
-    // 그렇지 않으면 기존 DB 조회 결과인 project를 사용
-    //
-    // 따라서 아래쪽 JSX는 기존 코드를 거의 수정하지 않아도 됨
+    // 목업 프로젝트가 있으면 mockProject
+    // 없으면 DB 조회 결과 project
     // ============================================================
     const displayProject =
         mockProject || project;
-
-
+    // ============================================================
+    // 6. Loading
+    //
+    // Hook들은 이미 모두 호출된 이후이므로
+    // 여기서 return해도 Hook 순서 문제가 발생하지 않는다.
+    // ============================================================
     if (loading && !mockProject) {
+
         return (
             <div className="ProjectDetailPage">
+
                 <div className="ProjectDetailLoading">
                     프로젝트 정보를 불러오는 중입니다...
                 </div>
+
             </div>
         );
     }
-
-
+    // ============================================================
+    // 7. Error
+    // ============================================================
     if (error && !mockProject) {
+
         return (
             <div className="ProjectDetailPage">
+
                 <div className="ProjectDetailError">
                     {error}
                 </div>
+
             </div>
         );
     }
-
-
+    // ============================================================
+    // 8. 프로젝트가 없는 경우
+    // ============================================================
     if (!displayProject) {
+
         return (
             <div className="ProjectDetailPage">
+
                 <div className="ProjectDetailError">
                     프로젝트가 존재하지 않습니다.
                 </div>
+
             </div>
         );
     }
-
-
-    // 수정: project → displayProject
-    // DB 프로젝트와 목업 프로젝트 모두 동일한 형태로 처리하기 위함
-    const startDate = new Date(displayProject.startDate);
-    const endDate = new Date(displayProject.endDate);
-    const today = new Date();
-
-
     // ============================================================
-    // 추가: 프로젝트 상태 표시
-    //
-    // 목록 카드(ProjectCard)와 동일하게 DB/목업의 status 값을 사용한다.
-    //
-    // PREPARING → 준비중
-    // ONGOING   → 진행중
-    // SUCCESS   → 성공
-    // FAILED    → 실패
-    //
-    // status가 없거나 알 수 없는 값이면 "상태 확인중"으로 표시한다.
+    // 9. 날짜 처리
+    // ============================================================
+    const startDate =
+        new Date(displayProject.startDate);
+
+    const endDate =
+        new Date(displayProject.endDate);
+
+    const today =
+        new Date();
+    // ============================================================
+    // 10. 프로젝트 상태 설정
     // ============================================================
     const STATUS_CONFIG = {
         PREPARING: {
@@ -171,57 +188,67 @@ function ProjectDetailPage() {
             className: "status-failed"
         }
     };
-
-
     const statusInfo =
         STATUS_CONFIG[displayProject.status] || {
             label: "상태 확인중",
             className: "status-unknown"
         };
-
-
     // ============================================================
-    // 추가: 실제 날짜 기준 마감 여부
-    //
-    // 기존 코드의 날짜 계산은 그대로 유지한다.
-    // 다만 상태 표시와는 별개의 값으로 사용한다.
+    // 11. 날짜 기준 마감 여부
     // ============================================================
-    const isEnded = today > endDate;
-
-
-    const navigate = useNavigate();
-    const [supportAmount, setSupportAmount] = useState(10000);
-    const [showSupportModal, setShowSupportModal] = useState(false);
-    const [submitting, setSubmitting] = useState(false);
-
-    // 상세 페이지의 "펀딩하기" 버튼 클릭 시 후원 금액 입력 모달이 뜨며 백엔드로 후원 요청을 보낸 후 마이페이지로 이동하는 동적 로직
+    const isEnded =
+        today > endDate;
+    // ============================================================
+    // 12. 후원 처리
+    // ============================================================
     const handleSupportSubmit = async () => {
-        if (!supportAmount || supportAmount <= 0) {
-            alert("유효한 후원 금액을 입력해 주세요.");
+        if (
+            !supportAmount ||
+            supportAmount <= 0
+        ) {
+            alert(
+                "유효한 후원 금액을 입력해 주세요."
+            );
             return;
         }
         try {
             setSubmitting(true);
-            await supportProject(displayProject.projectId, supportAmount);
-            alert("후원이 성공적으로 완료되었습니다!");
+            await supportProject(
+                displayProject.projectId,
+                supportAmount
+            );
+            alert(
+                "후원이 성공적으로 완료되었습니다!"
+            );
             setShowSupportModal(false);
+            // 후원 완료 후 후원 프로젝트 목록으로 이동
             navigate("/sponsoredprojects");
         } catch (err) {
-            console.error("후원 요청 실패:", err);
-            alert(err.response?.data?.message || err.message || "후원 처리 중 오류가 발생했습니다.");
+            console.error(
+                "후원 요청 실패:",
+                err
+            );
+            alert(
+                err.response?.data?.message ||
+                err.message ||
+                "후원 처리 중 오류가 발생했습니다."
+            );
+
         } finally {
             setSubmitting(false);
         }
     };
 
+    // ============================================================
+    // 13. 화면
+    // ============================================================
     return (
         <div className="ProjectDetailPage">
-
             <div className="ProjectDetailContainer">
-
-                {/* 프로젝트 이미지 */}
+                {/* ==================================================
+                    프로젝트 이미지
+                ================================================== */}
                 <div className="ProjectDetailImageBox">
-
                     {displayProject.thumbnailImage ? (
                         <img
                             src={displayProject.thumbnailImage}
@@ -233,152 +260,260 @@ function ProjectDetailPage() {
                             이미지가 없습니다.
                         </div>
                     )}
-
                 </div>
-
-
-                {/* 프로젝트 기본 정보 */}
+                {/* ==================================================
+                    프로젝트 기본 정보
+                ================================================== */}
                 <section className="ProjectDetailInfo">
-
-                    {/* 수정: 날짜 기준 "마감/진행중" 대신 DB/목업 status를 표시 */}
+                    {/* 프로젝트 상태 */}
                     <div
-                        className={`ProjectDetailStatus ${statusInfo.className}`}
+                        className={
+                            `ProjectDetailStatus ${statusInfo.className}`
+                        }
                     >
                         {statusInfo.label}
                     </div>
-
-
+                    {/* 프로젝트 제목 */}
                     <h1 className="ProjectDetailTitle">
                         {displayProject.title}
                     </h1>
-
-
+                    {/* 작성자 */}
                     <div className="ProjectDetailCreator">
-                        작성자&nbsp; {displayProject.creatorId}
+                        작성자&nbsp;
+                        {displayProject.creatorId}
                     </div>
-
-
+                    {/* 목표 금액 */}
                     <div className="ProjectDetailAmount">
-
-                        <span>목표 금액</span>
-
+                        <span>
+                            목표 금액
+                        </span>
                         <strong>
                             {Number(
                                 displayProject.targetAmount
-                            ).toLocaleString("ko-KR")}원
+                            ).toLocaleString("ko-KR")}
+                            원
                         </strong>
-
                     </div>
-
-
+                    {/* 펀딩 기간 */}
                     <div className="ProjectDetailDate">
-
                         <div>
-                            <span>펀딩 시작</span>
-
+                            <span>
+                                펀딩 시작
+                            </span>
                             <strong>
                                 {startDate.toLocaleDateString(
                                     "ko-KR"
                                 )}
                             </strong>
                         </div>
-
-
                         <div>
-                            <span>펀딩 종료</span>
-
+                            <span>
+                                펀딩 종료
+                            </span>
                             <strong>
                                 {endDate.toLocaleDateString(
                                     "ko-KR"
                                 )}
                             </strong>
                         </div>
-
                     </div>
-
-
-                    {/* 수정: 상태에 따라 펀딩 버튼 동작 변경 */}
+                    {/* ==================================================
+                        펀딩하기 버튼
+                    ================================================== */}
                     <button
                         className="ProjectDetailFundingBtn"
+
                         disabled={
                             displayProject.status !== "ONGOING" ||
                             isEnded
                         }
-                        onClick={() => setShowSupportModal(true)}
+
+                        onClick={() =>
+                            setShowSupportModal(true)
+                        }
                     >
                         {
                             displayProject.status === "PREPARING"
                                 ? "준비중인 프로젝트"
+
                                 : displayProject.status === "SUCCESS"
                                     ? "성공한 프로젝트"
+
                                     : displayProject.status === "FAILED"
                                         ? "실패한 프로젝트"
+
                                         : isEnded
                                             ? "마감된 프로젝트"
+
                                             : "펀딩하기"
                         }
                     </button>
-
                 </section>
-
+                {/* ==================================================
+                    후원 금액 입력 모달
+                ================================================== */}
                 {showSupportModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-                        <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl p-6 text-left border border-gray-200">
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">프로젝트 후원하기</h3>
-                            <p className="text-xs text-gray-500 mb-4">{displayProject.title}</p>
-
+                    <div
+                        className="
+                            fixed
+                            inset-0
+                            z-50
+                            flex
+                            items-center
+                            justify-center
+                            bg-black/50
+                            backdrop-blur-xs
+                            p-4
+                        "
+                    >
+                        <div
+                            className="
+                                bg-white
+                                w-full
+                                max-w-sm
+                                rounded-2xl
+                                shadow-xl
+                                p-6
+                                text-left
+                                border
+                                border-gray-200
+                            "
+                        >
+                            <h3
+                                className="
+                                    text-lg
+                                    font-bold
+                                    text-gray-900
+                                    mb-2
+                                "
+                            >
+                                프로젝트 후원하기
+                            </h3>
+                            <p
+                                className="
+                                    text-xs
+                                    text-gray-500
+                                    mb-4
+                                "
+                            >
+                                {displayProject.title}
+                            </p>
+                            {/* 후원 금액 */}
                             <div className="mb-4">
-                                <label className="block text-xs font-semibold text-gray-700 mb-1">후원 금액 (원)</label>
+                                <label
+                                    className="
+                                        block
+                                        text-xs
+                                        font-semibold
+                                        text-gray-700
+                                        mb-1
+                                    "
+                                >
+                                    후원 금액 (원)
+                                </label>
                                 <input
                                     type="number"
+
                                     value={supportAmount}
-                                    onChange={(e) => setSupportAmount(Number(e.target.value))}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-slate-800"
+
+                                    onChange={(e) =>
+                                        setSupportAmount(
+                                            Number(e.target.value)
+                                        )
+                                    }
+                                    className="
+                                        w-full
+                                        px-3
+                                        py-2
+                                        border
+                                        border-gray-300
+                                        rounded-lg
+                                        text-sm
+                                        focus:outline-none
+                                        focus:border-slate-800
+                                    "
+
                                     placeholder="금액 입력"
+
                                     step="1000"
+
                                     min="1000"
                                 />
                             </div>
-
-                            <div className="flex justify-end gap-2 pt-2">
+                            {/* 모달 버튼 */}
+                            <div
+                                className="
+                                    flex
+                                    justify-end
+                                    gap-2
+                                    pt-2
+                                "
+                            >
+                                {/* 취소 */}
                                 <button
-                                    onClick={() => setShowSupportModal(false)}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                                    onClick={() =>
+                                        setShowSupportModal(false)
+                                    }
+                                    className="
+                                        px-4
+                                        py-2
+                                        border
+                                        border-gray-300
+                                        rounded-lg
+                                        text-xs
+                                        font-semibold
+                                        text-gray-700
+                                        hover:bg-gray-50
+                                    "
                                     disabled={submitting}
                                 >
                                     취소
                                 </button>
+                                {/* 결제 */}
                                 <button
-                                    onClick={handleSupportSubmit}
-                                    className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800"
+                                    onClick={
+                                        handleSupportSubmit
+                                    }
+                                    className="
+                                        px-4
+                                        py-2
+                                        bg-slate-900
+                                        text-white
+                                        rounded-lg
+                                        text-xs
+                                        font-semibold
+                                        hover:bg-slate-800
+                                    "
                                     disabled={submitting}
                                 >
-                                    {submitting ? "처리 중..." : "후원 결제"}
+                                    {
+                                        submitting
+                                            ? "처리 중..."
+                                            : "후원 결제"
+                                    }
                                 </button>
                             </div>
                         </div>
                     </div>
                 )}
-
-
-                {/* 프로젝트 설명 */}
+                {/* ==================================================
+                    프로젝트 설명
+                ================================================== */}
                 <section className="ProjectDetailContent">
-
-                    <h2>프로젝트 소개</h2>
-
+                    <h2>
+                        프로젝트 소개
+                    </h2>
                     <div
                         className="ProjectDetailContentBody"
                         dangerouslySetInnerHTML={{
-                            __html: displayProject.contentHtml
+                            __html:
+                                displayProject.contentHtml ||
+                                ""
                         }}
                     />
-
                 </section>
-
             </div>
-
         </div>
     );
 }
-
 export default ProjectDetailPage;
