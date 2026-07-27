@@ -1,12 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { getSettlementHistory } from './services/myPageApi';
 
-/**
- * [크리에이터 정산 DB Schema 참고]
- * 1. Projects: PROJECT_ID, CREATOR_ID, TITLE, THUMBNAIL_IMAGE, TARGET_AMOUNT, CURRENT_AMOUNT, END_DATE, STATUS
- * 2. Settlements: SETTLEMENT_ID, PROJECT_ID, CREATOR_ID, TOTAL_RAISED, PLATFORM_FEE, PG_FEE, NET_AMOUNT, SETTLED_AT, STATUS, BANK_NAME, ACCOUNT_NUM, ACCOUNT_HOLDER
- */
-
-// 크리에이터 프로젝트 정산 내역 Mock 데이터셋
+// 크리에이터 프로젝트 정산 내역 Mock 데이터셋 (fallback)
 const MOCK_SETTLEMENT_HISTORY = [
     {
         settlementId: 2001,
@@ -16,9 +11,9 @@ const MOCK_SETTLEMENT_HISTORY = [
         targetAmount: 10000000,
         totalRaised: 12500000,
         backerCount: 142,
-        platformFee: 625000, // 5%
-        pgFee: 375000,       // 3%
-        netAmount: 11500000,  // 실지급액
+        platformFee: 625000,
+        pgFee: 375000,
+        netAmount: 11500000,
         settledAt: "2026-07-20",
         status: "COMPLETED",
         bankName: "신한은행",
@@ -33,71 +28,17 @@ const MOCK_SETTLEMENT_HISTORY = [
         targetAmount: 5000000,
         totalRaised: 6200000,
         backerCount: 88,
-        platformFee: 310000, // 5%
-        pgFee: 186000,       // 3%
+        platformFee: 310000,
+        pgFee: 186000,
         netAmount: 5704000,
         settledAt: "2026-06-15",
         status: "COMPLETED",
         bankName: "KB국민은행",
         accountNum: "456-12-345678",
         accountHolder: "김창작"
-    },
-    {
-        settlementId: 2003,
-        projectId: 103,
-        title: "초고음질 블루투스 수제 헤드폰",
-        thumbnailImage: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&auto=format&fit=crop&q=80",
-        targetAmount: 20000000,
-        totalRaised: 24500000,
-        backerCount: 210,
-        platformFee: 1225000,
-        pgFee: 735000,
-        netAmount: 22540000,
-        settledAt: "2026-07-28",
-        status: "PENDING",
-        bankName: "신한은행",
-        accountNum: "110-456-789012",
-        accountHolder: "김창작"
-    },
-    {
-        settlementId: 2004,
-        projectId: 104,
-        title: "아날로그 필름 감성 미니 카메라",
-        thumbnailImage: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&auto=format&fit=crop&q=80",
-        targetAmount: 8000000,
-        totalRaised: 2400000,
-        backerCount: 35,
-        platformFee: 0,
-        pgFee: 0,
-        netAmount: 0,
-        settledAt: "2026-05-10",
-        status: "FAILED",
-        bankName: "신한은행",
-        accountNum: "110-456-789012",
-        accountHolder: "김창작"
-    },
-    {
-        settlementId: 2005,
-        projectId: 105,
-        title: "Web3 펀딩체인 크리에이터 한정판 키트",
-        thumbnailImage: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&auto=format&fit=crop&q=80",
-        targetAmount: 15000000,
-        totalRaised: 18200000,
-        backerCount: 175,
-        platformFee: 910000,
-        pgFee: 546000,
-        netAmount: 16744000,
-        settledAt: "2026-07-24",
-        status: "IN_PROGRESS",
-        bankName: "하나은행",
-        accountNum: "987-65-432100",
-        accountHolder: "김창작"
     }
 ];
 
-/**
- * 정산 상태별 배지 및 라벨 설정
- */
 const STATUS_CONFIG = {
     ALL: { label: '전체', badgeClass: '' },
     COMPLETED: { label: '지급 완료', badgeClass: 'bg-accent/15 text-accent font-bold border border-accent/40' },
@@ -106,17 +47,14 @@ const STATUS_CONFIG = {
     FAILED: { label: '정산 무산', badgeClass: 'bg-warning/15 text-warning font-bold border border-warning/40' },
 };
 
-/** 통화 포맷팅 (원) */
 const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val || 0) + '원';
 
-/** ISO 날짜 문자열 포맷팅 (년.월.일) */
 const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 };
 
-/** 날짜 그룹핑 전용 키 (YYYY.MM.DD (요일)) */
 const getDateGroupKey = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -124,61 +62,86 @@ const getDateGroupKey = (dateStr) => {
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`;
 };
 
-/**
- * 마이페이지 - 크리에이터 프로젝트 정산 내역 컴포넌트 (SettlementHistoryPage)
- */
 function SettlementHistoryPage() {
+    const [historyList, setHistoryList] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [sortBy, setSortBy] = useState('LATEST');
     const [selectedStatement, setSelectedStatement] = useState(null);
 
-    // 정산 요약 통계
-    const stats = useMemo(() => {
-        const completedItems = MOCK_SETTLEMENT_HISTORY.filter(item => item.status === 'COMPLETED');
-        const pendingItems = MOCK_SETTLEMENT_HISTORY.filter(item => item.status === 'PENDING' || item.status === 'IN_PROGRESS');
+    // 백엔드 정산 계산 API(getSettlementHistory) 데이터를 실시간 수신하도록 연결
+    useEffect(() => {
+        const fetchSettlements = async () => {
+            try {
+                setLoading(true);
+                const data = await getSettlementHistory();
+                if (Array.isArray(data)) {
+                    setHistoryList(data);
+                } else {
+                    setHistoryList(MOCK_SETTLEMENT_HISTORY);
+                }
+            } catch (err) {
+                console.error("정산 내역 조회 실패, 목업 데이터 사용:", err);
+                setHistoryList(MOCK_SETTLEMENT_HISTORY);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        const totalCompletedAmount = completedItems.reduce((acc, curr) => acc + curr.netAmount, 0);
-        const totalPendingAmount = pendingItems.reduce((acc, curr) => acc + curr.netAmount, 0);
-        const totalCount = MOCK_SETTLEMENT_HISTORY.length;
-
-        const totalFees = completedItems.reduce((acc, curr) => acc + curr.platformFee + curr.pgFee, 0);
-
-        return { totalCompletedAmount, totalPendingAmount, totalCount, totalFees };
+        fetchSettlements();
     }, []);
 
-    // 필터링 및 정렬
+    const stats = useMemo(() => {
+        const completedItems = historyList.filter(item => item.status === 'COMPLETED');
+        const pendingItems = historyList.filter(item => item.status === 'PENDING' || item.status === 'IN_PROGRESS');
+
+        const totalCompletedAmount = completedItems.reduce((acc, curr) => acc + (curr.netAmount || 0), 0);
+        const totalPendingAmount = pendingItems.reduce((acc, curr) => acc + (curr.netAmount || 0), 0);
+        const totalCount = historyList.length;
+
+        const totalFees = completedItems.reduce((acc, curr) => acc + (curr.platformFee || 0) + (curr.pgFee || 0), 0);
+
+        return { totalCompletedAmount, totalPendingAmount, totalCount, totalFees };
+    }, [historyList]);
+
     const filteredHistory = useMemo(() => {
-        return MOCK_SETTLEMENT_HISTORY.filter((item) => {
+        return historyList.filter((item) => {
             if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
-                return item.title.toLowerCase().includes(term);
+                return item.title ? item.title.toLowerCase().includes(term) : false;
             }
             return true;
         }).sort((a, b) => {
             if (sortBy === 'LATEST') return new Date(b.settledAt) - new Date(a.settledAt);
             if (sortBy === 'OLDEST') return new Date(a.settledAt) - new Date(b.settledAt);
-            if (sortBy === 'HIGH_AMOUNT') return b.netAmount - a.netAmount;
-            if (sortBy === 'LOW_AMOUNT') return a.netAmount - b.netAmount;
+            if (sortBy === 'HIGH_AMOUNT') return (b.netAmount || 0) - (a.netAmount || 0);
+            if (sortBy === 'LOW_AMOUNT') return (a.netAmount || 0) - (b.netAmount || 0);
             return 0;
         });
-    }, [searchTerm, statusFilter, sortBy]);
+    }, [historyList, searchTerm, statusFilter, sortBy]);
 
-    // 날짜별 그룹핑
     const groupedHistory = useMemo(() => {
         const groups = {};
         filteredHistory.forEach((item) => {
-            const dateKey = getDateGroupKey(item.settledAt);
+            const dateKey = getDateGroupKey(item.settledAt) || '기타';
             if (!groups[dateKey]) groups[dateKey] = [];
             groups[dateKey].push(item);
         });
         return groups;
     }, [filteredHistory]);
 
+    if (loading) {
+        return (
+            <div className="w-full max-w-[1080px] mx-auto px-6 py-20 text-center text-gray-500 font-sans">
+                정산 내역을 불러오는 중입니다...
+            </div>
+        );
+    }
+
     return (
         <div className="w-full max-w-[1080px] mx-auto px-6 py-10 font-sans text-gray-900">
-
             {/* 1. 페이지 헤더 */}
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
                 <div className="text-left">
@@ -206,8 +169,6 @@ function SettlementHistoryPage() {
                     <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-accent animate-pulse" />
                         <span className="text-xs text-tcolor font-semibold">FundChain 크리에이터 정산 요약</span>
-                        <span className="text-xs text-gray-300">|</span>
-                        <span className="text-xs text-gray-500">지급 계좌: 신한은행 110-456-789012</span>
                     </div>
                 </div>
 
@@ -230,7 +191,6 @@ function SettlementHistoryPage() {
 
             {/* 3. 검색 & 필터 바 */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-6 bg-gray-50 p-3 rounded-xl border border-gray-200">
-                {/* 상태 탭 */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
                     {Object.keys(STATUS_CONFIG).map((statusKey) => {
                         const isActive = statusFilter === statusKey;
@@ -250,7 +210,6 @@ function SettlementHistoryPage() {
                     })}
                 </div>
 
-                {/* 검색창 & 정렬 */}
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1 md:w-56">
                         <input
@@ -278,29 +237,27 @@ function SettlementHistoryPage() {
                 </div>
             </div>
 
-            {/* 4. 정산 내역 리스트 (날짜별 그룹) */}
+            {/* 4. 정산 내역 리스트 */}
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                 {Object.keys(groupedHistory).length > 0 ? (
                     Object.keys(groupedHistory).map((dateKey) => (
                         <div key={dateKey} className="border-b border-gray-100 last:border-b-0">
-                            {/* 날짜 구분선 */}
                             <div className="bg-gray-50/80 px-4 py-2 border-y border-gray-100 text-xs font-semibold text-gray-500 text-left">
                                 {dateKey}
                             </div>
 
-                            {/* 정산 내역 행 목록 */}
                             <div className="divide-y divide-gray-100">
                                 {groupedHistory[dateKey].map((item) => {
                                     const isFailed = item.status === 'FAILED';
                                     const statusInfo = STATUS_CONFIG[item.status] || { label: item.status, badgeClass: '' };
-                                    const achievementRate = Math.round((item.totalRaised / item.targetAmount) * 100);
+                                    const targetAmountNum = item.targetAmount || 1;
+                                    const achievementRate = Math.round(((item.totalRaised || 0) / targetAmountNum) * 100);
 
                                     return (
                                         <div
                                             key={item.settlementId}
                                             className="px-4 py-3.5 hover:bg-slate-50/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left"
                                         >
-                                            {/* 왼쪽: 프로젝트 및 펀딩 요약 */}
                                             <div className="flex items-start gap-3 flex-1 min-w-0">
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 mb-0.5">
@@ -317,7 +274,6 @@ function SettlementHistoryPage() {
                                                 </div>
                                             </div>
 
-                                            {/* 오른쪽: 정산 금액 + 명세서 버튼 */}
                                             <div className="flex items-center justify-between sm:justify-end gap-4 flex-shrink-0 pl-13 sm:pl-0">
                                                 <div className="text-left sm:text-right">
                                                     <span className={`text-base font-extrabold font-sans ${isFailed ? 'text-gray-400' : 'text-tcolor'
@@ -343,7 +299,6 @@ function SettlementHistoryPage() {
                         </div>
                     ))
                 ) : (
-                    /* 내역 없음 */
                     <div className="p-12 text-center text-gray-400">
                         <svg className="w-10 h-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -357,7 +312,6 @@ function SettlementHistoryPage() {
             {selectedStatement && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
                     <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden text-left border border-gray-200">
-                        {/* 헤더 */}
                         <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
                             <div>
                                 <h3 className="font-bold text-base">프로젝트 정산 명세서</h3>
@@ -371,7 +325,6 @@ function SettlementHistoryPage() {
                             </button>
                         </div>
 
-                        {/* 본문 */}
                         <div className="p-5 space-y-3.5 text-xs text-gray-700 font-sans">
                             <div className="pb-3 border-b border-gray-100">
                                 <span className="text-gray-400 block mb-0.5">프로젝트명</span>
@@ -397,12 +350,11 @@ function SettlementHistoryPage() {
                                 <div>
                                     <span className="text-gray-400 block mb-0.5">정산 처리 상태</span>
                                     <p className="font-semibold text-slate-900">
-                                        {STATUS_CONFIG[selectedStatement.status]?.label}
+                                        {STATUS_CONFIG[selectedStatement.status]?.label || selectedStatement.status}
                                     </p>
                                 </div>
                             </div>
 
-                            {/* 수수료 내역 및 입금액 계산 */}
                             <div className="bg-gray-50 p-3.5 rounded-xl space-y-2 border border-gray-200">
                                 <div className="flex justify-between text-gray-600">
                                     <span>총 펀딩 성공액</span>
@@ -429,7 +381,6 @@ function SettlementHistoryPage() {
                             </div>
                         </div>
 
-                        {/* 푸터 */}
                         <div className="p-3.5 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
                             <button
                                 onClick={() => window.print()}

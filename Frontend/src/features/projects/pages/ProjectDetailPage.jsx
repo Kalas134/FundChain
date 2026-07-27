@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import useProjects from "../hooks/useProjects";
 import "../../../styles/frame.css";
-
-// 추가: 크리에이터 마이페이지에서 사용하던 목업 프로젝트 데이터
 import { mockCreatorProjects } from "../../mypage/mockData";
+import { supportProject } from "../../mypage/services/myPageApi";
 
 
 function ProjectDetailPage() {
@@ -190,6 +189,31 @@ function ProjectDetailPage() {
     const isEnded = today > endDate;
 
 
+    const navigate = useNavigate();
+    const [supportAmount, setSupportAmount] = useState(10000);
+    const [showSupportModal, setShowSupportModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+
+    // 상세 페이지의 "펀딩하기" 버튼 클릭 시 후원 금액 입력 모달이 뜨며 백엔드로 후원 요청을 보낸 후 마이페이지로 이동하는 동적 로직
+    const handleSupportSubmit = async () => {
+        if (!supportAmount || supportAmount <= 0) {
+            alert("유효한 후원 금액을 입력해 주세요.");
+            return;
+        }
+        try {
+            setSubmitting(true);
+            await supportProject(displayProject.projectId, supportAmount);
+            alert("후원이 성공적으로 완료되었습니다!");
+            setShowSupportModal(false);
+            navigate("/sponsoredprojects");
+        } catch (err) {
+            console.error("후원 요청 실패:", err);
+            alert(err.response?.data?.message || err.message || "후원 처리 중 오류가 발생했습니다.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div className="ProjectDetailPage">
 
@@ -280,6 +304,7 @@ function ProjectDetailPage() {
                             displayProject.status !== "ONGOING" ||
                             isEnded
                         }
+                        onClick={() => setShowSupportModal(true)}
                     >
                         {
                             displayProject.status === "PREPARING"
@@ -295,6 +320,45 @@ function ProjectDetailPage() {
                     </button>
 
                 </section>
+
+                {showSupportModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+                        <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl p-6 text-left border border-gray-200">
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">프로젝트 후원하기</h3>
+                            <p className="text-xs text-gray-500 mb-4">{displayProject.title}</p>
+
+                            <div className="mb-4">
+                                <label className="block text-xs font-semibold text-gray-700 mb-1">후원 금액 (원)</label>
+                                <input
+                                    type="number"
+                                    value={supportAmount}
+                                    onChange={(e) => setSupportAmount(Number(e.target.value))}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-slate-800"
+                                    placeholder="금액 입력"
+                                    step="1000"
+                                    min="1000"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-2 pt-2">
+                                <button
+                                    onClick={() => setShowSupportModal(false)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                                    disabled={submitting}
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    onClick={handleSupportSubmit}
+                                    className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800"
+                                    disabled={submitting}
+                                >
+                                    {submitting ? "처리 중..." : "후원 결제"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
 
                 {/* 프로젝트 설명 */}
