@@ -116,12 +116,22 @@ function Mypage(props) {
     }
 
     return (
-        <div className='px-16'>
+        <div className='px-16 pb-20'>
             {/* 사용자 정보 표시 및 수정 기능을 제공하는 프로필 카드 컴포넌트 */}
             <Card
                 userInfo={userInfo}
                 onUpdate={handleUpdate}
             />
+
+            {/* 카드 오른쪽 아래 회원 탈퇴 버튼 */}
+            <div className="mt-6 flex justify-end">
+                <button
+                    type="button"
+                    className="px-4 py-2 text-sm font-semibold text-warning bg-white border border-warning/40 rounded-lg hover:bg-warning hover:text-white transition-all duration-200 shadow-sm active:scale-95 cursor-pointer"
+                >
+                    회원 탈퇴
+                </button>
+            </div>
         </div>
     );
 }
