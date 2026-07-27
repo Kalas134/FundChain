@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 function HomePage() {
     return (
@@ -30,19 +31,22 @@ function HomePage() {
 
                     {/* 버튼 영역 */}
                     <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+                        <Link to={"/projects"}>
                         <button
                             type="button"
                             className="rounded-lg bg-accent px-7 py-3 text-sm font-semibold text-white transition-colors hover:opacity-90"
                         >
                             프로젝트 둘러보기
                         </button>
-
+                        </Link>
+                        <Link to={"/AboutPage"}>
                         <button
                             type="button"
                             className="rounded-lg border border-gray-200 bg-white px-7 py-3 text-sm font-semibold text-tcolor transition-colors hover:bg-gray-50"
                         >
                             FundChain 소개
                         </button>
+                        </Link>
                     </div>
 
                 </section>
