@@ -197,6 +197,7 @@ const SponsoredProjectsPage = () => {
                                     </div>
 
                                     <button
+                                        onClick={() => navigate(`/projects/${project.projectId}`)}
                                         className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-800 hover:text-gray-600 transition-colors"
                                         aria-label="상세보기"
                                     >
@@ -212,7 +213,9 @@ const SponsoredProjectsPage = () => {
                                             후기 작성
                                         </button>
                                     )}
-                                    <button className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
+                                    <button
+                                        onClick={() => navigate("/transactionhistory")} // 지금 우선 연결부터 해 놓음
+                                        className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
                                         후원 상세
                                     </button>
                                     <button className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
