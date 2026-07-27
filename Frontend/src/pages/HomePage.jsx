@@ -6,12 +6,12 @@ function HomePage() {
         <div className="min-h-screen w-full bg-bg text-tcolor">
 
             {/* 홈 메인 영역 */}
-            <main className="flex min-h-[calc(100vh-160px)] w-full flex-col items-center justify-center px-6 py-16 text-center">
+            <main className="flex min-h-[calc(100vh-160px)] w-full flex-col items-center justify-center px-6 py-10 text-center">
 
                 {/* 메인 타이틀 */}
                 <section className="flex w-full max-w-[1080px] flex-col items-center">
 
-                    <p className="mb-4 text-sm font-semibold tracking-[0.2em] text-accent">
+                    <p className="mb-2 text-sm font-semibold tracking-[0.2em] text-accent">
                         FUNDCHAIN
                     </p>
 
@@ -21,7 +21,7 @@ function HomePage() {
                         함께 성장하는 크라우드 펀딩
                     </h1>
 
-                    <p className="mt-6 max-w-[650px] text-base leading-7 text-gray-500 md:text-lg">
+                    <p className="mt-3 max-w-[650px] text-base leading-7 text-gray-500 md:text-lg">
                         창작자와 후원자를 연결하고,
                         <br />
                         프로젝트의 시작부터 후원까지 투명하게 관리하는
@@ -30,7 +30,7 @@ function HomePage() {
                     </p>
 
                     {/* 버튼 영역 */}
-                    <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
+                    <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row">
                         <Link to={"/projects"}>
                         <button
                             type="button"
@@ -53,10 +53,10 @@ function HomePage() {
 
 
                 {/* 서비스 특징 */}
-                <section className="mt-20 grid w-full max-w-[1080px] grid-cols-1 gap-5 md:grid-cols-3">
+                <section className="mt-10 grid w-full max-w-[1080px] grid-cols-1 gap-5 md:grid-cols-3">
 
-                    <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
+                    <div className="flex min-h-[100px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-1 py-5 text-center shadow-sm">
+                        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
                             01
                         </div>
 
@@ -64,7 +64,7 @@ function HomePage() {
                             신뢰할 수 있는 펀딩
                         </h2>
 
-                        <p className="mt-3 text-sm leading-6 text-gray-500">
+                        <p className="mt-1 text-sm leading-6 text-gray-500">
                             프로젝트 생성부터 후원까지
                             <br />
                             전체 과정을 관리합니다.
@@ -72,8 +72,8 @@ function HomePage() {
                     </div>
 
 
-                    <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
+                    <div className="flex min-h-[100px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-1 py-5 text-center shadow-sm">
+                        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
                             02
                         </div>
 
@@ -81,7 +81,7 @@ function HomePage() {
                             투명한 거래 기록
                         </h2>
 
-                        <p className="mt-3 text-sm leading-6 text-gray-500">
+                        <p className="mt-1 text-sm leading-6 text-gray-500">
                             SHA-256 기반 검증 구조로
                             <br />
                             거래 데이터의 무결성을 관리합니다.
@@ -89,8 +89,8 @@ function HomePage() {
                     </div>
 
 
-                    <div className="flex min-h-[180px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
+                    <div className="flex min-h-[100px] flex-col items-center justify-center rounded-xl border border-gray-200 bg-white px-1 py-5 text-center shadow-sm">
+                        <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-lg font-bold text-accent">
                             03
                         </div>
 
@@ -98,7 +98,7 @@ function HomePage() {
                             함께 만드는 프로젝트
                         </h2>
 
-                        <p className="mt-3 text-sm leading-6 text-gray-500">
+                        <p className="mt-1 text-sm leading-6 text-gray-500">
                             창작자와 후원자를 연결하여
                             <br />
                             새로운 프로젝트를 만들어갑니다.

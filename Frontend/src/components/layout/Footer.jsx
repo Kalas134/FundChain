@@ -6,7 +6,7 @@ function Footer() {
         <footer className="w-full border-t border-gray-200 bg-white">
 
             {/* Footer 전체 컨테이너 */}
-            <div className="mx-auto flex w-full max-w-[1080px] flex-col px-6 py-10">
+            <div className="mx-auto flex w-full max-w-[1080px] flex-col px-6 py-5">
 
                 {/* 상단 영역 */}
                 <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
@@ -55,7 +55,7 @@ function Footer() {
 
 
                 {/* 구분선 */}
-                <div className="my-8 border-t border-gray-100" />
+                <div className="my-4 border-t border-gray-100" />
 
 
                 {/* 하단 영역 */}
