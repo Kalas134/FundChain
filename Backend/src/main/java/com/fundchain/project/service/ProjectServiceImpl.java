@@ -38,8 +38,6 @@ public class ProjectServiceImpl implements ProjectService {
     private final HashChainService hashChainService;
 
 
-
-
     /**
      * 프로젝트 생성
      */
@@ -50,14 +48,41 @@ public class ProjectServiceImpl implements ProjectService {
             String creatorId
     ) {
 
+        // ========================================================
         // 1. 생성자 조회
-        User creator = userRepository.findByUserId(creatorId)
+        //
+        // 탈퇴하지 않은 회원만 조회
+        // ========================================================
+
+        User creator = userRepository
+                .findByUserIdAndIsDeletedFalse(creatorId)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("존재하지 않는 사용자입니다.")
+                        new IllegalArgumentException(
+                                "존재하지 않는 회원이거나 탈퇴한 회원입니다."
+                        )
                 );
 
 
-        // 2. 프로젝트 Entity 생성
+        // ========================================================
+        // 2. CREATOR 권한 검증
+        //
+        // USER → 프로젝트 생성 불가
+        // CREATOR → 프로젝트 생성 가능
+        // ADMIN → 현재 프로젝트 생성 권한 없음
+        // ========================================================
+
+        if (!"CREATOR".equals(creator.getUserRole())) {
+
+            throw new IllegalArgumentException(
+                    "크리에이터만 프로젝트를 생성할 수 있습니다."
+            );
+        }
+
+
+        // ========================================================
+        // 3. 프로젝트 Entity 생성
+        // ========================================================
+
         Project project = Project.builder()
                 .creator(creator)
                 .title(request.getTitle())
@@ -69,15 +94,23 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
 
-        // 3. 프로젝트 저장
-        Project savedProject = projectRepository.save(project);
+        // ========================================================
+        // 4. 프로젝트 저장
+        // ========================================================
+
+        Project savedProject =
+                projectRepository.save(project);
 
 
-        // 4. 상세 내용 저장
-        ProjectContent content = ProjectContent.builder()
-                .project(savedProject)
-                .contentHtml(request.getContentHtml())
-                .build();
+        // ========================================================
+        // 5. 프로젝트 상세 내용 저장
+        // ========================================================
+
+        ProjectContent content =
+                ProjectContent.builder()
+                        .project(savedProject)
+                        .contentHtml(request.getContentHtml())
+                        .build();
 
 
         savedProject.addProjectContent(content);
@@ -101,6 +134,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .toList();
     }
 
+
     /**
      * 크리에이터의 프로젝트 목록 조회
      */
@@ -116,18 +150,20 @@ public class ProjectServiceImpl implements ProjectService {
                 .toList();
     }
 
+
     /**
      * 프로젝트 상세 조회
      */
     @Override
     public ProjectResponse getProject(Long projectId) {
 
-
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("프로젝트가 존재하지 않습니다.")
-                );
-
+        Project project =
+                projectRepository.findById(projectId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "프로젝트가 존재하지 않습니다."
+                                )
+                        );
 
         return convertToResponse(project);
     }
@@ -144,14 +180,19 @@ public class ProjectServiceImpl implements ProjectService {
             String userId
     ) {
 
+        Project project =
+                projectRepository.findById(projectId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "프로젝트가 존재하지 않습니다."
+                                )
+                        );
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("프로젝트가 존재하지 않습니다.")
-                );
 
+        // ========================================================
+        // 프로젝트 작성자 확인
+        // ========================================================
 
-        // 작성자 검증
         if (!project.getCreator()
                 .getUserId()
                 .equals(userId)) {
@@ -160,7 +201,6 @@ public class ProjectServiceImpl implements ProjectService {
                     "수정 권한이 없습니다."
             );
         }
-
 
 
         project.updateProject(
@@ -172,10 +212,13 @@ public class ProjectServiceImpl implements ProjectService {
                 request.getStatus()
         );
 
+
         if (project.getProjectContent() != null) {
 
             project.getProjectContent()
-                    .updateContent(request.getContentHtml());
+                    .updateContent(
+                            request.getContentHtml()
+                    );
         }
 
 
@@ -193,14 +236,19 @@ public class ProjectServiceImpl implements ProjectService {
             String userId
     ) {
 
+        Project project =
+                projectRepository.findById(projectId)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "프로젝트가 존재하지 않습니다."
+                                )
+                        );
 
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("프로젝트가 존재하지 않습니다.")
-                );
 
+        // ========================================================
+        // 프로젝트 작성자 확인
+        // ========================================================
 
-        // 작성자 확인
         if (!project.getCreator()
                 .getUserId()
                 .equals(userId)) {
@@ -216,48 +264,143 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     /**
-     * 프로젝트 상태 배치 업데이트 (스케줄러에 의해 호출)
+     * 프로젝트 상태 배치 업데이트
+     *
+     * 스케줄러에 의해 호출
      */
     @Override
     @Transactional
     public void processProjectStatusUpdates() {
-        OffsetDateTime now = OffsetDateTime.now();
 
-        // 1. PREPARING -> ONGOING (시작일이 도래했고 종료일이 지나지 않은 프로젝트)
-        List<Project> preparingProjects = projectRepository.findByStatusAndStartDateLessThanEqual(ProjectStatus.PREPARING, now);
+        OffsetDateTime now =
+                OffsetDateTime.now();
+
+
+        // ========================================================
+        // 1. PREPARING → ONGOING
+        // ========================================================
+
+        List<Project> preparingProjects =
+                projectRepository
+                        .findByStatusAndStartDateLessThanEqual(
+                                ProjectStatus.PREPARING,
+                                now
+                        );
+
+
         for (Project project : preparingProjects) {
+
             if (project.getEndDate().isAfter(now)) {
-                project.updateProject(null, null, null, null, null, ProjectStatus.ONGOING);
+
+                project.updateProject(
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        ProjectStatus.ONGOING
+                );
             }
         }
 
-        // 2. ONGOING -> SUCCESS / FAILED (종료일이 지난 진행 중 프로젝트)
-        List<Project> ongoingProjects = projectRepository.findByStatusAndEndDateLessThanEqual(ProjectStatus.ONGOING, now);
+
+        // ========================================================
+        // 2. ONGOING → SUCCESS / FAILED
+        // ========================================================
+
+        List<Project> ongoingProjects =
+                projectRepository
+                        .findByStatusAndEndDateLessThanEqual(
+                                ProjectStatus.ONGOING,
+                                now
+                        );
+
+
         for (Project project : ongoingProjects) {
+
             updateEndedProjectStatus(project);
         }
 
-        // 3. PREPARING -> SUCCESS / FAILED (종료일마저 지난 시작 전 방치 프로젝트)
-        List<Project> expiredPreparingProjects = projectRepository.findByStatusAndEndDateLessThanEqual(ProjectStatus.PREPARING, now);
+
+        // ========================================================
+        // 3. PREPARING → SUCCESS / FAILED
+        //
+        // 시작하지 않았지만 종료일까지 지난 경우
+        // ========================================================
+
+        List<Project> expiredPreparingProjects =
+                projectRepository
+                        .findByStatusAndEndDateLessThanEqual(
+                                ProjectStatus.PREPARING,
+                                now
+                        );
+
+
         for (Project project : expiredPreparingProjects) {
+
             updateEndedProjectStatus(project);
         }
     }
 
-    private void updateEndedProjectStatus(Project project) {
-        BigDecimal totalSupported = transactionLedgerRepository.findTotalAmountByProjectIdAndTransactionType(project.getProjectId(), "SUPPORT");
+
+    /**
+     * 종료된 프로젝트 상태 처리
+     */
+    private void updateEndedProjectStatus(
+            Project project
+    ) {
+
+        BigDecimal totalSupported =
+                transactionLedgerRepository
+                        .findTotalAmountByProjectIdAndTransactionType(
+                                project.getProjectId(),
+                                "SUPPORT"
+                        );
+
+
         if (totalSupported == null) {
-            totalSupported = BigDecimal.ZERO;
+
+            totalSupported =
+                    BigDecimal.ZERO;
         }
 
-        if (totalSupported.compareTo(project.getTargetAmount()) >= 0) {
-            // 1. 목표 금액 달성 -> SUCCESS
-            project.updateProject(null, null, null, null, null, ProjectStatus.SUCCESS);
 
-            // 2. 자동 정산 (SETTLEMENT) 해시체인 트랜잭션 기록 (중복 생성 방지)
-            if (totalSupported.compareTo(BigDecimal.ZERO) > 0 &&
-                    !transactionLedgerRepository.existsByProjectIdAndTransactionType(project.getProjectId(), "SETTLEMENT")) {
-                String creatorId = project.getCreator().getUserId();
+        // ========================================================
+        // 목표 금액 달성
+        // ========================================================
+
+        if (totalSupported.compareTo(
+                project.getTargetAmount()
+        ) >= 0) {
+
+            project.updateProject(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    ProjectStatus.SUCCESS
+            );
+
+
+            // 자동 정산
+            if (
+                    totalSupported.compareTo(
+                            BigDecimal.ZERO
+                    ) > 0
+                            &&
+                            !transactionLedgerRepository
+                                    .existsByProjectIdAndTransactionType(
+                                            project.getProjectId(),
+                                            "SETTLEMENT"
+                                    )
+            ) {
+
+                String creatorId =
+                        project.getCreator()
+                                .getUserId();
+
+
                 hashChainService.createTransaction(
                         project.getProjectId(),
                         creatorId,
@@ -265,14 +408,44 @@ public class ProjectServiceImpl implements ProjectService {
                         "SETTLEMENT"
                 );
             }
-        } else {
-            // 1. 목표 금액 미달 -> FAILED
-            project.updateProject(null, null, null, null, null, ProjectStatus.FAILED);
 
-            // 2. 자동 환불 (REFUND) 해시체인 트랜잭션 기록 (중복 생성 방지)
-            if (!transactionLedgerRepository.existsByProjectIdAndTransactionType(project.getProjectId(), "REFUND")) {
-                List<TransactionLedger> supportLedgers = transactionLedgerRepository.findByProjectIdAndTransactionType(project.getProjectId(), "SUPPORT");
-                for (TransactionLedger ledger : supportLedgers) {
+
+            // ========================================================
+            // 목표 금액 미달
+            // ========================================================
+
+        } else {
+
+            project.updateProject(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    ProjectStatus.FAILED
+            );
+
+
+            // 자동 환불
+            if (
+                    !transactionLedgerRepository
+                            .existsByProjectIdAndTransactionType(
+                                    project.getProjectId(),
+                                    "REFUND"
+                            )
+            ) {
+
+                List<TransactionLedger> supportLedgers =
+                        transactionLedgerRepository
+                                .findByProjectIdAndTransactionType(
+                                        project.getProjectId(),
+                                        "SUPPORT"
+                                );
+
+
+                for (TransactionLedger ledger :
+                        supportLedgers) {
+
                     hashChainService.createTransaction(
                             project.getProjectId(),
                             ledger.getUserId(),
@@ -286,24 +459,38 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     /**
-     * Entity -> DTO 변환
+     * Entity → DTO 변환
      */
-    private ProjectResponse convertToResponse(Project project) {
-
-
+    private ProjectResponse convertToResponse(
+            Project project
+    ) {
 
         return ProjectResponse.builder()
-                .projectId(project.getProjectId())
+                .projectId(
+                        project.getProjectId()
+                )
                 .creatorId(
                         project.getCreator()
                                 .getUserId()
                 )
-                .title(project.getTitle())
-                .thumbnailImage(project.getThumbnailImage())
-                .targetAmount(project.getTargetAmount())
-                .startDate(project.getStartDate())
-                .endDate(project.getEndDate())
-                .status(project.getStatus())
+                .title(
+                        project.getTitle()
+                )
+                .thumbnailImage(
+                        project.getThumbnailImage()
+                )
+                .targetAmount(
+                        project.getTargetAmount()
+                )
+                .startDate(
+                        project.getStartDate()
+                )
+                .endDate(
+                        project.getEndDate()
+                )
+                .status(
+                        project.getStatus()
+                )
                 .contentHtml(
                         project.getProjectContent() != null
                                 ? project.getProjectContent()

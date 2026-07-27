@@ -8,9 +8,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @Tag(name = "프로젝트 API", description = "프로젝트 CRUD")
 @RestController
@@ -26,28 +28,17 @@ public class ProjectController {
      * 프로젝트 등록
      *
      * POST /api/projects
+     *
+     * 로그인한 사용자의 JWT에서 userId를 가져온다.
      */
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
-            @RequestBody ProjectCreateRequest request
-
-            /*
-             * 현재 JWT 인증 구현 전 임시 처리
-             *
-             * 추후 변경:
-             *
-             * @AuthenticationPrincipal CustomUserDetails userDetails
-             *
-             * 또는
-             *
-             * SecurityContextHolder.getContext()
-             *        .getAuthentication()
-             *
-             * 을 통해 인증된 사용자의 ID 추출 예정
-             */
-            ,
-            @RequestParam String creatorId
+            @RequestBody ProjectCreateRequest request,
+            Authentication authentication
     ) {
+
+        String creatorId = authentication.getName();
+
 
         ProjectResponse response =
                 projectService.createProject(
@@ -55,17 +46,19 @@ public class ProjectController {
                         creatorId
                 );
 
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
 
 
-
     /**
      * 프로젝트 목록 조회
      *
      * GET /api/projects
+     *
+     * 비로그인 사용자도 조회 가능
      */
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getProjects() {
@@ -76,10 +69,13 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+
     /**
      * 특정 크리에이터의 프로젝트 목록 조회
      *
      * GET /api/projects/creator/{creatorId}
+     *
+     * 비로그인 사용자도 조회 가능
      */
     @GetMapping("/creator/{creatorId}")
     public ResponseEntity<List<ProjectResponse>> getProjectsByCreator(
@@ -94,10 +90,13 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
+
     /**
      * 프로젝트 상세 조회
      *
      * GET /api/projects/{projectId}
+     *
+     * 비로그인 사용자도 조회 가능
      */
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> getProject(
@@ -111,25 +110,22 @@ public class ProjectController {
     }
 
 
-
     /**
      * 프로젝트 수정
      *
      * PUT /api/projects/{projectId}
+     *
+     * 로그인한 사용자의 JWT에서 userId를 가져온다.
      */
     @PutMapping("/{projectId}")
     public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable Long projectId,
-            @RequestBody ProjectUpdateRequest request
-
-            /*
-             * 현재 JWT 인증 전 임시 처리
-             *
-             * 추후 인증 객체에서 userId 추출 예정
-             */
-            ,
-            @RequestParam String userId
+            @RequestBody ProjectUpdateRequest request,
+            Authentication authentication
     ) {
+
+        String userId = authentication.getName();
+
 
         ProjectResponse response =
                 projectService.updateProject(
@@ -138,33 +134,32 @@ public class ProjectController {
                         userId
                 );
 
+
         return ResponseEntity.ok(response);
     }
-
 
 
     /**
      * 프로젝트 삭제
      *
      * DELETE /api/projects/{projectId}
+     *
+     * 로그인한 사용자의 JWT에서 userId를 가져온다.
      */
     @DeleteMapping("/{projectId}")
     public ResponseEntity<Void> deleteProject(
-            @PathVariable Long projectId
-
-            /*
-             * 현재 JWT 인증 전 임시 처리
-             *
-             * 추후 인증 객체에서 userId 추출 예정
-             */
-            ,
-            @RequestParam String userId
+            @PathVariable Long projectId,
+            Authentication authentication
     ) {
+
+        String userId = authentication.getName();
+
 
         projectService.deleteProject(
                 projectId,
                 userId
         );
+
 
         return ResponseEntity
                 .noContent()

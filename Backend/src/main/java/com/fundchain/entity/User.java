@@ -129,6 +129,9 @@ public class User {
 
     /**
      * Soft Delete 여부
+     *
+     * false → 정상 회원
+     * true  → 탈퇴 회원
      */
     @Column(
             name = "IS_DELETED",
@@ -141,18 +144,38 @@ public class User {
     /**
      * 회원 정보 수정 (마이페이지)
      */
-    public void updateMyPageInfo(String nickname, String phoneNum, String bankName, String accountNum) {
+    public void updateMyPageInfo(
+            String nickname,
+            String phoneNum,
+            String bankName,
+            String accountNum
+    ) {
+
         if (nickname != null && !nickname.isBlank()) {
             this.nickname = nickname;
         }
+
         if (phoneNum != null && !phoneNum.isBlank()) {
             this.phoneNum = phoneNum;
         }
+
         if (bankName != null) {
             this.bankName = bankName;
         }
+
         if (accountNum != null) {
             this.accountNum = accountNum;
         }
+    }
+
+
+    /**
+     * 회원 탈퇴 (Soft Delete)
+     *
+     * 실제 DB 데이터는 삭제하지 않는다.
+     * IS_DELETED만 false → true로 변경한다.
+     */
+    public void deleteAccount() {
+        this.isDeleted = true;
     }
 }
