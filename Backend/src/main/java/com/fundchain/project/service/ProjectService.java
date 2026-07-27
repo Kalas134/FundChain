@@ -72,4 +72,11 @@ public interface ProjectService {
             String userId
     );
 
+    /**
+     * 프로젝트 상태 배치 업데이트
+     * - PREPARING 상태 중 시작일이 도래한 프로젝트 -> ONGOING 전환
+     * - ONGOING/PREPARING 상태 중 종료일이 지난 프로젝트 -> 목표 금액 달성 여부에 따라 SUCCESS 또는 FAILED 전환
+     */
+    void processProjectStatusUpdates();
+
 }

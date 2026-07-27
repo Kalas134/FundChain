@@ -3,17 +3,22 @@ package com.fundchain.project.service;
 import com.fundchain.entity.Project;
 import com.fundchain.entity.ProjectContent;
 import com.fundchain.entity.ProjectStatus;
+import com.fundchain.entity.TransactionLedger;
 import com.fundchain.entity.User;
+import com.fundchain.hashchain.HashChainService;
 import com.fundchain.project.dto.ProjectCreateRequest;
 import com.fundchain.project.dto.ProjectResponse;
 import com.fundchain.project.dto.ProjectUpdateRequest;
 import com.fundchain.repository.ProjectContentRepository;
 import com.fundchain.repository.ProjectRepository;
+import com.fundchain.repository.TransactionLedgerRepository;
 import com.fundchain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -27,6 +32,12 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
 
     private final ProjectContentRepository projectContentRepository;
+
+    private final TransactionLedgerRepository transactionLedgerRepository;
+
+    private final HashChainService hashChainService;
+
+
 
 
     /**
@@ -205,9 +216,80 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     /**
+     * 프로젝트 상태 배치 업데이트 (스케줄러에 의해 호출)
+     */
+    @Override
+    @Transactional
+    public void processProjectStatusUpdates() {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        // 1. PREPARING -> ONGOING (시작일이 도래했고 종료일이 지나지 않은 프로젝트)
+        List<Project> preparingProjects = projectRepository.findByStatusAndStartDateLessThanEqual(ProjectStatus.PREPARING, now);
+        for (Project project : preparingProjects) {
+            if (project.getEndDate().isAfter(now)) {
+                project.updateProject(null, null, null, null, null, ProjectStatus.ONGOING);
+            }
+        }
+
+        // 2. ONGOING -> SUCCESS / FAILED (종료일이 지난 진행 중 프로젝트)
+        List<Project> ongoingProjects = projectRepository.findByStatusAndEndDateLessThanEqual(ProjectStatus.ONGOING, now);
+        for (Project project : ongoingProjects) {
+            updateEndedProjectStatus(project);
+        }
+
+        // 3. PREPARING -> SUCCESS / FAILED (종료일마저 지난 시작 전 방치 프로젝트)
+        List<Project> expiredPreparingProjects = projectRepository.findByStatusAndEndDateLessThanEqual(ProjectStatus.PREPARING, now);
+        for (Project project : expiredPreparingProjects) {
+            updateEndedProjectStatus(project);
+        }
+    }
+
+    private void updateEndedProjectStatus(Project project) {
+        BigDecimal totalSupported = transactionLedgerRepository.findTotalAmountByProjectIdAndTransactionType(project.getProjectId(), "SUPPORT");
+        if (totalSupported == null) {
+            totalSupported = BigDecimal.ZERO;
+        }
+
+        if (totalSupported.compareTo(project.getTargetAmount()) >= 0) {
+            // 1. 목표 금액 달성 -> SUCCESS
+            project.updateProject(null, null, null, null, null, ProjectStatus.SUCCESS);
+
+            // 2. 자동 정산 (SETTLEMENT) 해시체인 트랜잭션 기록 (중복 생성 방지)
+            if (totalSupported.compareTo(BigDecimal.ZERO) > 0 &&
+                    !transactionLedgerRepository.existsByProjectIdAndTransactionType(project.getProjectId(), "SETTLEMENT")) {
+                String creatorId = project.getCreator().getUserId();
+                hashChainService.createTransaction(
+                        project.getProjectId(),
+                        creatorId,
+                        totalSupported.longValue(),
+                        "SETTLEMENT"
+                );
+            }
+        } else {
+            // 1. 목표 금액 미달 -> FAILED
+            project.updateProject(null, null, null, null, null, ProjectStatus.FAILED);
+
+            // 2. 자동 환불 (REFUND) 해시체인 트랜잭션 기록 (중복 생성 방지)
+            if (!transactionLedgerRepository.existsByProjectIdAndTransactionType(project.getProjectId(), "REFUND")) {
+                List<TransactionLedger> supportLedgers = transactionLedgerRepository.findByProjectIdAndTransactionType(project.getProjectId(), "SUPPORT");
+                for (TransactionLedger ledger : supportLedgers) {
+                    hashChainService.createTransaction(
+                            project.getProjectId(),
+                            ledger.getUserId(),
+                            ledger.getAmount(),
+                            "REFUND"
+                    );
+                }
+            }
+        }
+    }
+
+
+    /**
      * Entity -> DTO 변환
      */
     private ProjectResponse convertToResponse(Project project) {
+
 
 
         return ProjectResponse.builder()
