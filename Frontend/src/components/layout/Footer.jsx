@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function Footer() {
     return (
@@ -27,26 +28,26 @@ function Footer() {
                     {/* 서비스 링크 */}
                     <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm md:justify-end">
 
-                        <button
-                            type="button"
+                        <Link
+                            to="/projects"
                             className="text-gray-500 transition-colors hover:text-tcolor"
                         >
                             프로젝트
-                        </button>
+                        </Link>
 
-                        <button
-                            type="button"
+                        <Link
+                            to="/AboutPage"
                             className="text-gray-500 transition-colors hover:text-tcolor"
                         >
                             FundChain 소개
-                        </button>
+                        </Link>
 
-                        <button
-                            type="button"
+                        <Link
+                            to="/support"
                             className="text-gray-500 transition-colors hover:text-tcolor"
                         >
                             고객센터
-                        </button>
+                        </Link>
 
                     </div>
 
