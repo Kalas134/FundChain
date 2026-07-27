@@ -20,9 +20,9 @@ public class ProjectScheduler {
 
     /**
      * 주기적으로 프로젝트 상태 업데이트를 수행합니다.
-     * 기본 설정: 매 분 0초마다 실행 (cron = "0 * * * * *")
+     * 기본 설정: 매일 자정(오전 12시 00분 00초)에 실행 (cron = "0 0 0 * * *")
      */
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void scheduleProjectStatusUpdate() {
         log.info("[Scheduler] 프로젝트 상태 업데이트 작업을 시작합니다.");
         try {
