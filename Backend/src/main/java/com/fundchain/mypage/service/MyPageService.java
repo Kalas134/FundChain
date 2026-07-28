@@ -18,6 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -120,7 +121,9 @@ public class MyPageService {
     public List<SponsoredProjectResponse> getSponsoredProjects(String userId) {
         List<SupportHistory> histories = supportHistoryRepository.findByUser_UserIdOrderBySupportedAtDesc(userId);
         return histories.stream()
+                .filter(sh -> sh.getProject() != null)
                 .map(this::convertToSponsoredResponse)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
@@ -135,7 +138,13 @@ public class MyPageService {
 
         for (SupportHistory sh : histories) {
             Project project = sh.getProject();
+            if (project == null) continue;
+
             User creator = project.getCreator();
+            String creatorId = creator != null ? creator.getUserId() : "알 수 없음";
+            String creatorNickname = creator != null && creator.getNickname() != null ? creator.getNickname() : creatorId;
+            String bankName = creator != null && creator.getBankName() != null ? creator.getBankName() : "등록 계좌";
+            String accountNum = creator != null && creator.getAccountNum() != null ? creator.getAccountNum() : "";
 
             BigDecimal currentAmount = supportHistoryRepository.findTotalSupportedAmountByProjectId(project.getProjectId());
 
@@ -143,19 +152,19 @@ public class MyPageService {
                     .supportId(sh.getSupportId())
                     .projectId(project.getProjectId())
                     .userId(userId)
-                    .amount(sh.getAmount().longValue())
+                    .amount(sh.getAmount() != null ? sh.getAmount().longValue() : 0L)
                     .supportedAt(sh.getSupportedAt() != null ? sh.getSupportedAt().format(dateFormatter) : "")
-                    .title(project.getTitle())
+                    .title(project.getTitle() != null ? project.getTitle() : "제목 없음")
                     .thumbnailImage(project.getThumbnailImage())
-                    .targetAmount(project.getTargetAmount())
+                    .targetAmount(project.getTargetAmount() != null ? project.getTargetAmount() : BigDecimal.ZERO)
                     .currentAmount(currentAmount != null ? currentAmount : BigDecimal.ZERO)
                     .startDate(project.getStartDate() != null ? project.getStartDate().format(dateFormatter) : "")
                     .endDate(project.getEndDate() != null ? project.getEndDate().format(dateFormatter) : "")
                     .status(project.getStatus() != null ? project.getStatus().name() : "ONGOING")
-                    .creatorId(creator.getUserId())
-                    .creatorNickname(creator.getNickname() != null ? creator.getNickname() : creator.getUserId())
-                    .bankName(creator.getBankName() != null ? creator.getBankName() : "등록 계좌")
-                    .accountNum(creator.getAccountNum() != null ? creator.getAccountNum() : "")
+                    .creatorId(creatorId)
+                    .creatorNickname(creatorNickname)
+                    .bankName(bankName)
+                    .accountNum(accountNum)
                     .build());
         }
 
@@ -202,9 +211,9 @@ public class MyPageService {
             result.add(SettlementHistoryResponse.builder()
                     .settlementId(project.getProjectId())
                     .projectId(project.getProjectId())
-                    .title(project.getTitle())
+                    .title(project.getTitle() != null ? project.getTitle() : "제목 없음")
                     .thumbnailImage(project.getThumbnailImage())
-                    .targetAmount(project.getTargetAmount())
+                    .targetAmount(project.getTargetAmount() != null ? project.getTargetAmount() : BigDecimal.ZERO)
                     .totalRaised(totalRaised)
                     .backerCount(backerCount)
                     .platformFee(platformFee)
@@ -223,6 +232,8 @@ public class MyPageService {
 
     private SponsoredProjectResponse convertToSponsoredResponse(SupportHistory sh) {
         Project project = sh.getProject();
+        if (project == null) return null;
+
         DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
 
         String statusStr;
@@ -249,16 +260,18 @@ public class MyPageService {
         }
 
         OffsetDateTime supportedAt = sh.getSupportedAt() != null ? sh.getSupportedAt() : OffsetDateTime.now();
+        Long amountVal = sh.getAmount() != null ? sh.getAmount().longValue() : 0L;
 
         return SponsoredProjectResponse.builder()
                 .id(sh.getSupportId())
                 .projectId(project.getProjectId())
-                .title(project.getTitle())
-                .description(project.getProjectContent() != null ? project.getProjectContent().getContentHtml() : "")
+                .title(project.getTitle() != null ? project.getTitle() : "제목 없음")
+                .description(project.getProjectContent() != null && project.getProjectContent().getContentHtml() != null 
+                        ? project.getProjectContent().getContentHtml() : "")
                 .imageUrl(project.getThumbnailImage())
                 .sponsoredDate(supportedAt.format(displayFormatter))
-                .price(String.format("%,d원", sh.getAmount().longValue()))
-                .amount(sh.getAmount().longValue())
+                .price(String.format("%,d원", amountVal))
+                .amount(amountVal)
                 .status(statusStr)
                 .deliveryStatus(deliveryStr)
                 .year(supportedAt.getYear())

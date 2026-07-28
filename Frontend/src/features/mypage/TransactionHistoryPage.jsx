@@ -70,25 +70,30 @@ function TransactionHistoryPage() {
     const [sortBy, setSortBy] = useState('LATEST');
     const [selectedReceipt, setSelectedReceipt] = useState(null);
 
+    const [error, setError] = useState(null);
+
+    const fetchTransactions = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getTransactionHistory();
+            if (Array.isArray(data)) {
+                setHistoryList(data);
+            } else {
+                setHistoryList([]);
+            }
+        } catch (err) {
+            console.error("거래 내역 조회 실패:", err);
+            const msg = err.response?.data?.message || err.message || "거래 내역을 불러오지 못했습니다. 로그인 상태를 확인해 주세요.";
+            setError(msg);
+            setHistoryList([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // 백엔드 결제/거래 내역 API(getTransactionHistory) 연동
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                setLoading(true);
-                const data = await getTransactionHistory();
-                if (Array.isArray(data)) {
-                    setHistoryList(data);
-                } else {
-                    setHistoryList(MOCK_TRANSACTION_HISTORY);
-                }
-            } catch (err) {
-                console.error("거래 내역 조회 실패, 목업 데이터 사용:", err);
-                setHistoryList(MOCK_TRANSACTION_HISTORY);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchTransactions();
     }, []);
 
@@ -135,6 +140,28 @@ function TransactionHistoryPage() {
         return (
             <div className="w-full max-w-[1080px] mx-auto px-6 py-20 text-center text-gray-500 font-sans">
                 거래 내역을 불러오는 중입니다...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="w-full max-w-[1080px] mx-auto px-6 py-20 text-center text-gray-600 font-sans">
+                <p className="text-lg font-semibold text-rose-600 mb-4">{error}</p>
+                <div className="flex justify-center gap-4">
+                    <button
+                        onClick={fetchTransactions}
+                        className="px-4 py-2 bg-gray-500 text-white font-medium rounded-lg shadow hover:bg-opacity-90 transition-all"
+                    >
+                        다시 시도
+                    </button>
+                    <button
+                        onClick={() => window.location.href = "/LoginPage"}
+                        className="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow hover:bg-opacity-90 transition-all shadow-md"
+                    >
+                        로그인 페이지로 이동
+                    </button>
+                </div>
             </div>
         );
     }

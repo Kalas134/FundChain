@@ -17,9 +17,10 @@ import java.util.List;
 public interface SupportHistoryRepository extends JpaRepository<SupportHistory, Long> {
 
     /**
-     * 특정 후원자의 후원 내역 최신순 조회
+     * 특정 후원자의 후원 내역 최신순 조회 (프로젝트 조인 페치)
      */
-    List<SupportHistory> findByUser_UserIdOrderBySupportedAtDesc(String userId);
+    @Query("SELECT s FROM SupportHistory s JOIN FETCH s.project p WHERE s.user.userId = :userId ORDER BY s.supportedAt DESC")
+    List<SupportHistory> findByUser_UserIdOrderBySupportedAtDesc(@Param("userId") String userId);
 
     /**
      * 특정 프로젝트의 후원 내역 목록 조회

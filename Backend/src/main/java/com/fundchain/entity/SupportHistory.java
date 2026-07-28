@@ -3,6 +3,9 @@ package com.fundchain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
@@ -25,6 +28,7 @@ public class SupportHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PROJECT_ID", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)

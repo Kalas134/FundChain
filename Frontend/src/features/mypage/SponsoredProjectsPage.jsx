@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockProjects } from './mockData';
 import { getSponsoredProjects } from './services/myPageApi';
 
 /**
@@ -10,30 +9,34 @@ const SponsoredProjectsPage = () => {
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedTab, setSelectedTab] = useState('전체');
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
 
-    // 백엔드 API(getSponsoredProjects)를 통해 실제 후원한 프로젝트 내역을 받아오도록 연동 (미로그인/서버 연결 전 상태 대비 예외 처리 완료)
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                setLoading(true);
-                const data = await getSponsoredProjects();
-                if (Array.isArray(data)) {
-                    setProjects(data);
-                } else {
-                    setProjects(mockProjects);
-                }
-            } catch (err) {
-                console.error("후원 프로젝트 목록 조회 실패, 목업 데이터 사용:", err);
-                setProjects(mockProjects);
-            } finally {
-                setLoading(false);
+    const fetchProjects = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getSponsoredProjects();
+            if (Array.isArray(data)) {
+                setProjects(data);
+            } else {
+                setProjects([]);
             }
-        };
+        } catch (err) {
+            console.error("후원 프로젝트 목록 조회 실패:", err);
+            const msg = err.response?.data?.message || err.message || "후원 내역을 불러오지 못했습니다. 로그인 상태를 확인해 주세요.";
+            setError(msg);
+            setProjects([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    // 백엔드 API(getSponsoredProjects)를 통해 실제 후원한 프로젝트 내역을 받아오도록 연동
+    useEffect(() => {
         fetchProjects();
     }, []);
 
@@ -79,6 +82,28 @@ const SponsoredProjectsPage = () => {
         return (
             <div className="w-full max-w-[1080px] mx-auto px-6 py-20 text-center text-gray-500 font-sans">
                 후원 내역을 불러오는 중입니다...
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="w-full max-w-[1080px] mx-auto px-6 py-20 text-center text-gray-600 font-sans">
+                <p className="text-lg font-semibold text-rose-600 mb-4">{error}</p>
+                <div className="flex justify-center gap-4">
+                    <button
+                        onClick={fetchProjects}
+                        className="px-4 py-2 bg-gray-500 text-white font-medium rounded-lg shadow hover:bg-opacity-90 transition-all"
+                    >
+                        다시 시도
+                    </button>
+                    <button
+                        onClick={() => navigate('/LoginPage')}
+                        className="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow hover:bg-opacity-90 transition-all shadow-md"
+                    >
+                        로그인 페이지로 이동
+                    </button>
+                </div>
             </div>
         );
     }
