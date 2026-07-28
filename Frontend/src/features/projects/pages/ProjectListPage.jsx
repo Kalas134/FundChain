@@ -91,9 +91,12 @@ function ProjectListPage() {
     //
     // 실제 DB 데이터가 먼저 나오고 그 뒤에 목업 데이터가 나온다.
     // ============================================================
+    // DB 프로젝트 응답 데이터 배열 안전성 보장
+    const dbProjects = Array.isArray(projects) ? projects : [];
+
     const allProjects = [
         // 추가: DB 데이터에도 카드에서 사용할 description을 보완
-        ...projects.map((project) => ({
+        ...dbProjects.map((project) => ({
             ...project,
 
             // DB 응답에 description이 있으면 그대로 사용하고,
@@ -130,19 +133,17 @@ function ProjectListPage() {
             </h1>
 
             {
-                // 수정: projects.length → allProjects.length
-                allProjects.length > 0
-                    ? (
-                        // 추가: 카드 폭에 맞춰 프로젝트 카드를 가로 배치
-                        <div className="project-list-grid">
-                            {projectList}
-                        </div>
-                    )
-                    : (
-                        <p>
-                            등록된 프로젝트가 없습니다.
-                        </p>
-                    )
+                loading ? (
+                    <p>프로젝트 목록을 불러오는 중입니다...</p>
+                ) : allProjects.length > 0 ? (
+                    <div className="project-list-grid">
+                        {projectList}
+                    </div>
+                ) : (
+                    <p>
+                        등록된 프로젝트가 없습니다.
+                    </p>
+                )
             }
         </div>
     );

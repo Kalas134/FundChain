@@ -19,21 +19,7 @@ function ProjectCard({ project }) {
 
 
     // ============================================================
-    // 추가: PREPARING 상태 프로젝트 목록 노출 방지
-    //
-    // PREPARING:
-    // 아직 공개/진행 전인 프로젝트이므로
-    // 일반 프로젝트 목록에서는 표시하지 않는다.
-    //
-    // DB 프로젝트와 목업 프로젝트 모두 동일하게 적용된다.
-    // ============================================================
-    if (project.status === "PREPARING") {
-        return null;
-    }
-
-
-    // ============================================================
-    // 추가: 프로젝트 상태 표시 처리
+    // 프로젝트 상태 표시 처리
     //
     // DB 프로젝트:
     // project.isMock이 없으므로 실제 DB의 status를 사용한다.
@@ -77,9 +63,6 @@ function ProjectCard({ project }) {
     // 추가: 프로젝트 상태별 화면 표시 설정
     //
     // 기존 "오늘 마감" 위치에 상태 배지를 표시한다.
-    //
-    // PREPARING은 ProjectCard 위에서 이미 return null 처리되므로
-    // 여기에서는 ONGOING / SUCCESS / FAILED만 실제로 표시된다.
     // ============================================================
     const STATUS_CONFIG = {
         PREPARING: { label: '준비중', badgeClass: 'bg-amber-100 text-amber-800 border-amber-300' },
@@ -117,14 +100,11 @@ function ProjectCard({ project }) {
                     }}
                 />
 
-                {/* 수정:
-                    기존 "오늘 마감" 대신 프로젝트 상태를 표시한다.
-                    상태값에 대응하는 색상과 라벨을 함께 표시한다.
-                */}
+                {/* 프로젝트 상태 배지 및 badgeClass 적용 */}
                 {
                     statusInfo && (
                         <span
-                            className={`project-card-deadline border ${statusInfo.className}`}
+                            className={`project-card-deadline border ${statusInfo.badgeClass}`}
                         >
                             {statusInfo.label}
                         </span>

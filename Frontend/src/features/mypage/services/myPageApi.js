@@ -38,8 +38,9 @@ export const getMyProjects = async (creatorId) => {
     createdDate: project.startDate,
     title: project.title,
     description: project.contentHtml || '',
-    currentAmount: 0,
-    targetAmount: Number(project.targetAmount),
+    // DB 누적 모금액 매핑
+    currentAmount: Number(project.currentAmount || 0),
+    targetAmount: Number(project.targetAmount || 0),
     status: project.status,
     year: new Date(project.startDate).getFullYear(),
     month: new Date(project.startDate).getMonth() + 1

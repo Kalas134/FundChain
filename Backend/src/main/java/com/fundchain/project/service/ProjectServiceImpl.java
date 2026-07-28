@@ -12,6 +12,7 @@ import com.fundchain.project.dto.ProjectUpdateRequest;
 import com.fundchain.repository.ProjectContentRepository;
 import com.fundchain.repository.ProjectRepository;
 import com.fundchain.repository.TransactionLedgerRepository;
+import com.fundchain.repository.SupportHistoryRepository;
 import com.fundchain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectContentRepository projectContentRepository;
 
     private final TransactionLedgerRepository transactionLedgerRepository;
+
+    private final SupportHistoryRepository supportHistoryRepository;
 
     private final HashChainService hashChainService;
 
@@ -81,7 +84,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         // ========================================================
         // 3. 프로젝트 Entity 생성
+        //
+        // 시작일(startDate)이 현재 일시 이하인 경우 즉시 ONGOING으로 설정,
+        // 미래 시점인 경우 PREPARING으로 설정
         // ========================================================
+
+        OffsetDateTime now = OffsetDateTime.now();
+        ProjectStatus initialStatus = ProjectStatus.PREPARING;
+        if (request.getStartDate() != null && !request.getStartDate().isAfter(now)) {
+            initialStatus = ProjectStatus.ONGOING;
+        }
 
         Project project = Project.builder()
                 .creator(creator)
@@ -90,7 +102,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .targetAmount(request.getTargetAmount())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .status(ProjectStatus.PREPARING)
+                .status(initialStatus)
                 .build();
 
 
@@ -465,6 +477,16 @@ public class ProjectServiceImpl implements ProjectService {
             Project project
     ) {
 
+        // 프로젝트별 DB 누적 후원 금액 집계
+        BigDecimal currentAmount =
+                supportHistoryRepository.findTotalSupportedAmountByProjectId(
+                        project.getProjectId()
+                );
+
+        if (currentAmount == null) {
+            currentAmount = BigDecimal.ZERO;
+        }
+
         return ProjectResponse.builder()
                 .projectId(
                         project.getProjectId()
@@ -481,6 +503,9 @@ public class ProjectServiceImpl implements ProjectService {
                 )
                 .targetAmount(
                         project.getTargetAmount()
+                )
+                .currentAmount(
+                        currentAmount
                 )
                 .startDate(
                         project.getStartDate()

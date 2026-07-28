@@ -19,10 +19,9 @@ public class ProjectContent {
     private Long projectId;
 
     /**
-     * 프로젝트 상세 설명(HTML)
+     * 프로젝트 상세 설명(HTML) - PostgreSQL TEXT 컬럼 매핑
      */
-    @Lob
-    @Column(name = "CONTENT_HTML", nullable = false)
+    @Column(name = "CONTENT_HTML", nullable = false, columnDefinition = "TEXT")
     private String contentHtml;
 
     /**

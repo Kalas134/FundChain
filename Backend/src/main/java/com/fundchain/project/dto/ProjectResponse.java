@@ -37,6 +37,11 @@ public class ProjectResponse {
     private BigDecimal targetAmount;
 
     /**
+     * 현재 모금 금액
+     */
+    private BigDecimal currentAmount;
+
+    /**
      * 시작일
      */
     private OffsetDateTime startDate;
