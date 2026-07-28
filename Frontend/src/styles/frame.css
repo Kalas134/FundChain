@@ -7,6 +7,7 @@
 
 .header_left {
     align-items: left;
+    padding-top: 20px;
 }
 
 .header_search {
@@ -16,6 +17,7 @@
 .header_right1,
 .header_right2 {
     margin-right: 16px;
+    padding-top: 20px;
 }
 
 
@@ -41,7 +43,7 @@
     position: relative;
     text-decoration: none;
     color: var(--text-h);
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 600;
     transition:
         color .2s ease,
