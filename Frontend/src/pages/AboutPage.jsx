@@ -14,9 +14,9 @@ function AboutPage() {
                         ABOUT FUNDCHAIN
                     </p>
 
-                    <h1 className="text-4xl font-bold text-tcolor md:text-5xl">
+                    <h2 className="text-4xl font-bold text-tcolor">
                         FundChain
-                    </h1>
+                    </h2>
 
                     <p className="mt-2 text-lg text-gray-500">
                         투명하고 안전한 크라우드 펀딩 플랫폼
