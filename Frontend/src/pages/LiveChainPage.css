@@ -8,7 +8,20 @@
     position: relative;
     overflow-x: hidden;
     padding-bottom: 5rem;
+    animation: liveChainFadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+@keyframes liveChainFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 /* Background Canvas */
 .cyber-canvas {

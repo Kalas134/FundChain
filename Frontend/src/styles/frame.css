@@ -8,7 +8,11 @@
     position: relative;
     z-index: 60;
     width: 100%;
+    transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 
 .header-container {
     display: flex;
@@ -85,7 +89,11 @@
     border-bottom: 1px solid var(--border);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     width: 100%;
+    transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 
 .navigation-container {
     display: flex;
@@ -882,3 +890,133 @@
         font-size: 14px;
     }
 }
+
+/* =========================================================
+   Dynamic Theme Shift for Live Chain Page (Dark Theme)
+   ========================================================= */
+
+body {
+    transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="dark"] {
+    background-color: #090d16 !important;
+    color: #e2e8f0;
+}
+
+body[data-theme="dark"] .header {
+    background-color: rgba(9, 13, 22, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px);
+}
+
+body[data-theme="dark"] .header_logo {
+    filter: brightness(1.15) contrast(1.1);
+}
+
+body[data-theme="dark"] .navigation {
+    background-color: rgba(11, 15, 25, 0.95) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+}
+
+body[data-theme="dark"] .navigation-link {
+    color: #94a3b8 !important;
+}
+
+body[data-theme="dark"] .navigation-link:hover {
+    color: #38bdf8 !important;
+}
+
+body[data-theme="dark"] .navigation-link.active {
+    color: #34d399 !important;
+}
+
+body[data-theme="dark"] .header_right2 a {
+    color: #cbd5e1 !important;
+}
+
+body[data-theme="dark"] .header_right2 a:hover {
+    color: #38bdf8 !important;
+}
+
+body[data-theme="dark"] footer {
+    background-color: #070a10 !important;
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
+    transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body[data-theme="dark"] footer h2 {
+    color: #f1f5f9 !important;
+}
+
+body[data-theme="dark"] footer p,
+body[data-theme="dark"] footer a {
+    color: #64748b !important;
+}
+
+body[data-theme="dark"] footer a:hover {
+    color: #38bdf8 !important;
+}
+
+body[data-theme="dark"] footer div.border-t {
+    border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ProfileMenu Dark Mode Overrides */
+body[data-theme="dark"] .profile-menu-btn {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+body[data-theme="dark"] .profile-menu-btn:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+body[data-theme="dark"] .profile-menu-arrow {
+    filter: brightness(0) invert(1);
+}
+
+body[data-theme="dark"] .profile-menu-dropdown {
+    background-color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.7) !important;
+}
+
+body[data-theme="dark"] .profile-menu-info {
+    color: #f8fafc !important;
+    border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+body[data-theme="dark"] .profile-menu-username,
+body[data-theme="dark"] .profile-menu-info p {
+    color: #f8fafc !important;
+}
+
+body[data-theme="dark"] .profile-menu-email {
+    color: #94a3b8 !important;
+}
+
+
+body[data-theme="dark"] .profile-menu-item {
+    color: #cbd5e1 !important;
+}
+
+body[data-theme="dark"] .profile-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #38bdf8 !important;
+}
+
+body[data-theme="dark"] .profile-menu-logout {
+    color: #fb7185 !important;
+    border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body[data-theme="dark"] .profile-menu-logout:hover {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #fda4af !important;
+}
+
