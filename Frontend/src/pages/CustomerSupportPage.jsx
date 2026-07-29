@@ -89,38 +89,38 @@ function CustomerSupportPage() {
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="min-h-screen w-full bg-bg text-tcolor">
+    <div className="min-h-[calc(100vh-140px)] w-full bg-bg text-tcolor">
       {/* 고객센터 전체 컨테이너 */}
-      <main className="flex w-full flex-col items-center px-6 py-16">
+      <main className="container-custom flex flex-col items-center pt-12 pb-16 md:pt-16">
         
         {/* 상단 Hero 영역 */}
-        <section className="flex w-full max-w-[1080px] flex-col items-center rounded-2xl border border-gray-200 bg-white px-6 py-16 text-center shadow-sm">
-          <p className="mb-4 text-sm font-semibold tracking-[0.2em] text-accent">
+        <section className="flex w-full flex-col items-center rounded-2xl border border-slate-200 bg-white p-8 md:p-12 text-center shadow-sm">
+          <span className="mb-3 inline-block rounded-full bg-accent/10 px-4 py-1.5 text-xs font-bold tracking-widest text-accent uppercase">
             CUSTOMER CENTER
-          </p>
+          </span>
 
-          <h1 className="text-4xl font-bold text-tcolor md:text-5xl">
+          <h1 className="text-3xl font-bold text-thcolor sm:text-4xl my-2">
             자주 묻는 질문 (FAQ)
           </h1>
 
-          <p className="mt-5 text-lg text-gray-500">
+          <p className="mt-2 text-base md:text-lg font-medium text-slate-600">
             FundChain 서비스 이용에 도움이 필요하신가요?
           </p>
 
-          <p className="mt-3 max-w-[650px] text-sm leading-7 text-gray-500">
+          <p className="mt-2 max-w-[650px] text-sm md:text-base text-slate-500">
             궁금한 항목을 키워드로 검색하시거나 카테고리별 질문을 확인해 보세요.
           </p>
 
           {/* 검색 바 */}
-          <div className="relative mt-8 w-full max-w-[600px]">
+          <div className="relative mt-6 w-full max-w-[560px]">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="궁금하신 내용을 입력해 보세요 (예: 결제, 취소, 심사)"
-              className="w-full rounded-xl border border-gray-200 bg-gray-50 py-4 pl-5 pr-12 text-sm text-tcolor outline-none transition focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-5 pr-12 text-sm text-slate-800 outline-none transition focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5"
@@ -140,15 +140,15 @@ function CustomerSupportPage() {
         </section>
 
         {/* 카테고리 탭 영역 */}
-        <section className="mt-10 flex w-full max-w-[1080px] flex-wrap justify-center gap-2">
+        <section className="mt-8 flex w-full flex-wrap justify-center gap-2.5">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all ${
+              className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
                 selectedCategory === cat
-                  ? "bg-accent text-white shadow-sm"
-                  : "bg-white text-gray-600 border border-gray-200 hover:border-accent/40 hover:text-accent"
+                  ? "bg-accent text-white shadow-sm font-bold"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-accent/40 hover:text-accent"
               }`}
             >
               {cat}
@@ -157,30 +157,30 @@ function CustomerSupportPage() {
         </section>
 
         {/* FAQ 아코디언 리스트 영역 */}
-        <section className="mt-8 flex w-full max-w-[1080px] flex-col gap-4">
+        <section className="mt-8 flex w-full flex-col gap-3.5">
           {filteredFaqs.length > 0 ? (
             filteredFaqs.map((faq) => {
               const isOpen = openFaqId === faq.id;
               return (
                 <article
                   key={faq.id}
-                  className="overflow-hidden rounded-xl border border-gray-200 bg-white transition-all shadow-sm"
+                  className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all shadow-sm"
                 >
                   <button
                     onClick={() => toggleFaq(faq.id)}
-                    className="flex w-full items-center justify-between px-6 py-5 text-left transition hover:bg-gray-50/80"
+                    className="flex w-full items-center justify-between p-6 text-left transition hover:bg-slate-50/80"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-md bg-accent-bg px-2.5 py-1 text-xs font-semibold text-accent">
+                    <div className="flex items-center gap-4">
+                      <span className="w-28 shrink-0 text-center rounded-lg bg-accent/10 py-1 text-xs font-bold text-accent">
                         {faq.category}
                       </span>
-                      <h2 className="text-base font-semibold text-tcolor md:text-lg mb-0">
+                      <h3 className="text-base md:text-lg font-bold text-thcolor mb-0">
                         {faq.question}
-                      </h2>
+                      </h3>
                     </div>
                     <div
-                      className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 transition-transform duration-200 ${
-                        isOpen ? "rotate-180 bg-accent/10 text-accent" : "text-gray-400"
+                      className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 transition-transform duration-200 ${
+                        isOpen ? "rotate-180 bg-accent/10 text-accent" : "text-slate-400"
                       }`}
                     >
                       <svg
@@ -201,7 +201,7 @@ function CustomerSupportPage() {
                   </button>
 
                   {isOpen && (
-                    <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-5 text-sm leading-7 text-gray-600">
+                    <div className="border-t border-slate-100 bg-slate-50/60 p-6 text-sm leading-relaxed text-slate-600">
                       {faq.answer}
                     </div>
                   )}
@@ -209,10 +209,10 @@ function CustomerSupportPage() {
               );
             })
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white py-16 text-center shadow-sm">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center shadow-sm">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-12 w-12 text-gray-300 mb-3"
+                className="h-12 w-12 text-slate-300 mb-3"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -224,10 +224,10 @@ function CustomerSupportPage() {
                   d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <p className="text-base font-medium text-gray-500">
+              <p className="text-base font-semibold text-slate-600">
                 검색 결과와 일치하는 자주 묻는 질문이 없습니다.
               </p>
-              <p className="mt-1 text-xs text-gray-400">
+              <p className="mt-1 text-xs text-slate-400">
                 다른 검색어나 카테고리를 선택해보세요.
               </p>
             </div>
@@ -235,15 +235,15 @@ function CustomerSupportPage() {
         </section>
 
         {/* 하단 고객센터 안내 영역 */}
-        <section className="mt-12 flex w-full max-w-[1080px] flex-col items-center rounded-2xl border border-gray-200 bg-white px-6 py-10 text-center shadow-sm md:flex-row md:justify-between md:px-10 md:text-left">
+        <section className="mt-10 flex w-full flex-col items-center rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm md:flex-row md:justify-between md:p-10 md:text-left">
           <div>
-            <h2 className="text-xl font-bold text-tcolor">
+            <h2 className="text-xl font-bold text-thcolor">
               원하는 답을 찾지 못하셨나요?
             </h2>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-slate-500">
               고객센터 운영시간: 평일 10:00 ~ 18:00 (주말 및 공휴일 휴무)
             </p>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-slate-400">
               * 본 페이지는 자주 묻는 질문(FAQ) 안내 전용 정적 페이지입니다.
             </p>
           </div>
@@ -251,7 +251,7 @@ function CustomerSupportPage() {
           <div className="mt-6 md:mt-0">
             <a
               href="mailto:support@fundchain.com"
-              className="btn-primary inline-flex items-center justify-center px-6 py-3 text-sm font-semibold shadow"
+              className="btn-primary inline-flex items-center justify-center px-6 py-3 text-sm font-bold shadow-md hover:bg-indigo-600"
             >
               이메일 문의: support@fundchain.com
             </a>

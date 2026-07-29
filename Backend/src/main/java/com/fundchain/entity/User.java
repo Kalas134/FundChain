@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "users")
@@ -36,55 +37,50 @@ public class User {
 
 
     /**
-     * 암호화된 비밀번호
+     * 암호화된 비밀번호 (탈퇴 1년 후 파기 시 null 가능)
      */
     @Column(
             name = "PASSWORD",
-            nullable = false,
             length = 100
     )
     private String password;
 
 
     /**
-     * 닉네임
+     * 닉네임 (탈퇴 1년 후 파기 시 deleted_userId 형태 변경)
      */
     @Column(
             name = "NICKNAME",
-            nullable = false,
             unique = true,
-            length = 30
+            length = 50
     )
     private String nickname;
 
 
     /**
-     * 사용자 이름
+     * 사용자 이름 (탈퇴 1년 후 파기 시 null 가능)
      */
     @Column(
             name = "USERNAME",
-            nullable = false,
             length = 50
     )
     private String userName;
 
 
     /**
-     * 생년월일
+     * 생년월일 (탈퇴 1년 후 파기 시 null 가능)
      */
     @Column(
-            name = "BIRTHDATE",
-            nullable = false
+            name = "BIRTHDATE"
     )
     private LocalDate birthDate;
 
 
     /**
-     * 전화번호
+     * 전화번호 (탈퇴 1년 후 파기 시 null 가능)
      */
     @Column(
             name = "PHONE_NUM",
-            nullable = false,
             unique = true,
             length = 20
     )
@@ -92,11 +88,10 @@ public class User {
 
 
     /**
-     * 이메일
+     * 이메일 (탈퇴 1년 후 파기 시 null 가능)
      */
     @Column(
             name = "EMAIL",
-            nullable = false,
             unique = true,
             length = 100
     )
@@ -142,6 +137,13 @@ public class User {
 
 
     /**
+     * 탈퇴 신청 일시 (Soft Delete 시점)
+     */
+    @Column(name = "DELETED_AT")
+    private OffsetDateTime deletedAt;
+
+
+    /**
      * 회원 정보 수정 (마이페이지)
      */
     public void updateMyPageInfo(
@@ -172,10 +174,25 @@ public class User {
     /**
      * 회원 탈퇴 (Soft Delete)
      *
-     * 실제 DB 데이터는 삭제하지 않는다.
-     * IS_DELETED만 false → true로 변경한다.
+     * 실제 DB 레코드는 삭제하지 않는다.
+     * IS_DELETED만 false → true로 변경하고 DELETED_AT에 탈퇴 일시를 기록한다.
      */
     public void deleteAccount() {
         this.isDeleted = true;
+        this.deletedAt = OffsetDateTime.now();
+    }
+
+    /**
+     * 탈퇴 후 1년 지난 사용자 개인정보 익명화 (파기)
+     */
+    public void anonymizeUserInfo() {
+        this.password = null;
+        this.userName = null;
+        this.nickname = "deleted_" + this.userId;
+        this.email = null;
+        this.phoneNum = null;
+        this.birthDate = null;
+        this.bankName = null;
+        this.accountNum = null;
     }
 }

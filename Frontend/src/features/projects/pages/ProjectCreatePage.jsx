@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import ProjectForm from "../components/ProjectForm";
 import useProjects from "../hooks/useProjects";
 
-
 function ProjectCreatePage() {
 
     const navigate = useNavigate();
@@ -11,66 +10,56 @@ function ProjectCreatePage() {
         addProject
     } = useProjects();
 
-
     const handleSubmit = async (formData) => {
         try {
-            // JWT 적용 전 임시 creatorId
             const creatorId = localStorage.getItem("userId");
             const submitData = {
                 ...formData,
-                // 문자열 -> 숫자 변환
-                targetAmount: Number(
-                    formData.targetAmount
-                ),
-                // 날짜 ISO 변환
-                startDate:
-                    new Date(
-                        formData.startDate
-                    ).toISOString(),
-                endDate:
-                    new Date(
-                        formData.endDate
-                    ).toISOString(),
-                // HTML 태그 보정
-                contentHtml:
-                    formData.contentHtml.startsWith("<p>")
-                        ? formData.contentHtml
-                        :
-                        `<p>${formData.contentHtml}</p>`
+                targetAmount: Number(formData.targetAmount),
+                startDate: new Date(formData.startDate).toISOString(),
+                endDate: new Date(formData.endDate).toISOString(),
+                contentHtml: formData.contentHtml.startsWith("<p>")
+                    ? formData.contentHtml
+                    : `<p>${formData.contentHtml}</p>`
             };
 
-            await addProject(
-                submitData,
-                creatorId
-            );
-
-            alert(
-                "프로젝트가 등록되었습니다."
-            );
-
+            await addProject(submitData, creatorId);
+            alert("프로젝트가 성공적으로 등록되었습니다.");
             navigate("/projects");
         } catch (e) {
             console.error(e);
-            alert(
-                "프로젝트 등록 실패"
-            );
+            alert("프로젝트 등록에 실패했습니다. 입력 정보를 확인해주세요.");
         }
     };
 
-
     return (
-        <div>
-            <h1>
-                프로젝트 등록
-            </h1>
+        <div className="min-h-[calc(100vh-140px)] w-full bg-bg">
+            <main className="container-custom pt-10 pb-16">
+                
+                {/* Header Title Section */}
+                <div className="mb-8 border-b border-slate-200 pb-6 text-left">
+                    <span className="mb-2 inline-block text-xs font-bold tracking-widest text-accent uppercase">
+                        CREATE PROJECT
+                    </span>
+                    <h1 className="text-3xl font-bold text-thcolor my-1">
+                        프로젝트 등록
+                    </h1>
+                    <p className="text-slate-500 text-sm md:text-base">
+                        후원자들에게 인상 깊은 새로운 프로젝트 정보를 입력하고 펀딩을 시작해 보세요.
+                    </p>
+                </div>
 
-            <ProjectForm
-                onSubmit={handleSubmit}
-                submitText="등록"
-            />
+                {/* Form Wrapper - align left edge with title section */}
+                <div className="w-full">
+                    <ProjectForm
+                        onSubmit={handleSubmit}
+                        submitText="프로젝트 등록 완료"
+                    />
+                </div>
+
+            </main>
         </div>
     );
 }
-
 
 export default ProjectCreatePage;

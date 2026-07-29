@@ -82,3 +82,13 @@ export const supportProject = async (projectId, amount) => {
   const response = await api.post(`/mypage/support/${projectId}`, { amount });
   return response.data;
 };
+
+/**
+ * 회원 탈퇴 API
+ * DELETE /api/mypage/me
+ */
+export const deleteMyAccount = async () => {
+  const response = await api.delete('/mypage/me');
+  return response.data;
+};
+

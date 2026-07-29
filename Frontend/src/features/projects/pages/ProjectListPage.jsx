@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import useProjects from "../hooks/useProjects";
 import ProjectCard from "../components/ProjectCard";
 
-// 추가: 크리에이터 마이페이지에서 사용하던 목업 프로젝트 데이터
+// 크리에이터 마이페이지에서 사용하던 목업 프로젝트 데이터
 import { mockCreatorProjects } from "../../mypage/mockData";
 
 
@@ -19,103 +19,43 @@ function ProjectListPage() {
         fetchProjects();
     }, []);
 
-    // 이후에 useCallback 적용시
-    // useEffect(() => {
-    //     fetchProjects();
-    // }, [fetchProjects]);
-    // 로 변경
-
-
-    // ============================================================
-    // 추가: HTML 태그 제거 함수
-    //
-    // DB의 contentHtml이
-    // "<p>프로젝트 설명입니다.</p>"
-    // 형태로 들어오는 경우,
-    // 카드에서는 "프로젝트 설명입니다."만 표시하도록 한다.
-    // ============================================================
+    // HTML 태그 제거 함수
     const stripHtmlTags = (html) => {
         if (!html) {
             return "";
         }
-
         return html.replace(/<[^>]*>/g, "");
     };
 
-
-    // ============================================================
-    // 추가: 기존 mockCreatorProjects를 ProjectResponse 형태로 변환
-    //
-    // mockCreatorProjects의 구조:
-    // id, imageUrl, createdDate, description ...
-    //
-    // ProjectCard가 현재 사용하는 DB 프로젝트 구조:
-    // projectId, thumbnailImage, startDate, contentHtml ...
-    //
-    // 따라서 두 데이터를 같은 구조로 맞춰준다.
-    // ============================================================
+    // 기존 mockCreatorProjects를 ProjectResponse 형태로 변환
     const mockProjects = mockCreatorProjects.map((project) => ({
         projectId: project.projectId,
         creatorId: "mock-creator",
         title: project.title,
         thumbnailImage: project.imageUrl,
         targetAmount: project.targetAmount,
-
-        // 추가: ProjectCard에서 사용할 프로젝트 설명
         description: project.description,
-
-        // 목업의 year/month를 이용해 날짜 형태를 만들어준다.
         startDate: `${project.year}-${String(project.month).padStart(2, "0")}-01T00:00:00+09:00`,
         endDate: `${project.year}-${String(project.month).padStart(2, "0")}-30T23:59:59+09:00`,
-
         status: project.status,
-
-        // 추가: 해당 데이터가 목업 프로젝트임을 표시
-        // ProjectCard에서 목업/DB 프로젝트를 구분하여
-        // 상태 표시 방식을 다르게 처리할 때 사용한다.
         isMock: true,
-
-        // 목업의 description을 상세 내용처럼 사용
         contentHtml: `<p>${project.description}</p>`
     }));
 
-
-    // ============================================================
-    // 추가: DB 프로젝트 + 목업 프로젝트를 하나의 목록으로 합친다.
-    //
-    // DB 프로젝트:
-    // projects
-    //
-    // 목업 프로젝트:
-    // mockProjects
-    //
-    // 실제 DB 데이터가 먼저 나오고 그 뒤에 목업 데이터가 나온다.
-    // ============================================================
-    // DB 프로젝트 응답 데이터 배열 안전성 보장
+    // DB 프로젝트 + 목업 프로젝트 통합
     const dbProjects = Array.isArray(projects) ? projects : [];
 
     const allProjects = [
-        // 추가: DB 데이터에도 카드에서 사용할 description을 보완
         ...dbProjects.map((project) => ({
             ...project,
-
-            // DB 응답에 description이 있으면 그대로 사용하고,
-            // 없으면 contentHtml을 설명으로 사용한다.
-            //
-            // 추가: contentHtml에 포함된 HTML 태그를 제거한다.
             description:
                 project.description ||
                 stripHtmlTags(project.contentHtml) ||
                 ""
         })),
-
         ...mockProjects
     ];
 
-
-    // ============================================================
-    // 수정: projects 대신 allProjects를 사용
-    // ============================================================
     const projectList = allProjects.map(
         (project) => (
             <ProjectCard
@@ -125,26 +65,43 @@ function ProjectListPage() {
         )
     );
 
-
     return (
-        <div>
-            <h1>
-                프로젝트 목록
-            </h1>
-
-            {
-                loading ? (
-                    <p>프로젝트 목록을 불러오는 중입니다...</p>
-                ) : allProjects.length > 0 ? (
-                    <div className="project-list-grid">
-                        {projectList}
-                    </div>
-                ) : (
-                    <p>
-                        등록된 프로젝트가 없습니다.
+        <div className="min-h-[calc(100vh-140px)] w-full bg-bg">
+            <main className="container-custom pt-10 pb-16">
+                
+                {/* Header Title Section */}
+                <div className="mb-8 border-b border-slate-200 pb-6 text-left">
+                    <span className="mb-2 inline-block text-xs font-bold tracking-widest text-accent uppercase">
+                        EXPLORE PROJECTS
+                    </span>
+                    <h1 className="text-3xl font-bold text-thcolor my-1">
+                        프로젝트 둘러보기
+                    </h1>
+                    <p className="text-slate-500 text-sm md:text-base">
+                        새롭고 창의적인 펀딩 프로젝트들을 살펴보고 직접 후원에 참여해보세요.
                     </p>
-                )
-            }
+                </div>
+
+                {
+                    loading ? (
+                        <div className="flex justify-center items-center py-20">
+                            <p className="text-slate-500 text-base animate-pulse">
+                                프로젝트 목록을 불러오는 중입니다...
+                            </p>
+                        </div>
+                    ) : allProjects.length > 0 ? (
+                        <div className="project-list-grid">
+                            {projectList}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col justify-center items-center py-20 rounded-2xl border border-dashed border-slate-300 bg-white">
+                            <p className="text-slate-500 font-medium">
+                                등록된 프로젝트가 없습니다.
+                            </p>
+                        </div>
+                    )
+                }
+            </main>
         </div>
     );
 }

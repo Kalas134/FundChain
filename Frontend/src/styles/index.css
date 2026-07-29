@@ -7,132 +7,145 @@
 :root {
   /* 🎨 컬러 변수 설정 */
   --bg: #F8FAFC;
-  /* 기본 배경색 */
-  --text: #0F172A;
-  /* 기본 텍스트 컬러 (본문, 소제목 공통) */
-  --text-h: #1E293B;
-  /* 메인 타이틀 컬러 (대제목 전용) */
-  --accent: #00D4B2;
-  /* UI 강조 키컬러 (민트) */
+  --text: #0F172A;       /* 기본 텍스트 컬러 */
+  --text-h: #1E293B;     /* 헤딩 타이틀 컬러 */
+  --text-muted: #64748B; /* 보조 설명 컬러 */
+  
+  --accent: #00D4B2;     /* UI 강조 키컬러 (민트) */
   --accent-bg: rgba(0, 212, 178, 0.1);
   --accent-border: rgba(0, 212, 178, 0.5);
 
-  --primary-btn: #6366F1;
-  /* 펀딩 버튼 등 주요 버튼 컬러 (인디고) */
-  --btn-text: #F8FAFC;
-  /* 버튼에 들어가는 텍스트 컬러 */
-  --warning: #FF6584;
-  /* 경고 및 마감 임박 컬러 */
+  --primary-btn: #6366F1; /* 주요 버튼 컬러 (인디고) */
+  --btn-text: #FFFFFF;    /* 버튼 텍스트 컬러 */
+  --warning: #FF6584;     /* 경고 및 마감 임박 컬러 */
 
   /* 보조 UI 변수 */
   --border: #E2E8F0;
   --code-bg: #F1F5F9;
   --social-bg: rgba(241, 245, 249, 0.5);
-  --shadow:
-    rgba(15, 23, 42, 0.08) 0 10px 15px -3px, rgba(15, 23, 42, 0.04) 0 4px 6px -2px;
+  --shadow: rgba(15, 23, 42, 0.06) 0 4px 6px -1px, rgba(15, 23, 42, 0.04) 0 2px 4px -1px;
+  --shadow-md: rgba(15, 23, 42, 0.08) 0 10px 15px -3px, rgba(15, 23, 42, 0.04) 0 4px 6px -2px;
 
   /* 폰트 정의 (Pretendard 최우선) */
   --sans: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --heading: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  /* 본문 기본값: Regular(400) */
-  font: 400 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  /* 본문 기본값: Regular(400) 16px */
+  font: 400 16px/160% var(--sans);
+  letter-spacing: -0.01em;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 body {
   margin: 0;
   background: var(--bg);
   font-weight: 400;
-  /* 본문 기본 Regular(400) 보장 */
+  color: var(--text);
 }
 
 #root {
   max-width: 100%;
   margin: 0 auto;
-  text-align: center;
-  border-inline: none;
-  min-height: 100svh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   background: var(--bg);
 }
 
-/* 1. 대제목 (Page Title) */
+/* 글로벌 대제목 (Page Title) */
 h1 {
   font-family: var(--heading);
   font-weight: 700;
-  /* Bold (700) */
   color: var(--text-h);
-  /* 메인 타이틀 컬러 */
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
+  font-size: 36px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin: 24px 0 16px;
 
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+  @media (max-width: 768px) {
+    font-size: 28px;
+    margin: 16px 0 12px;
   }
 }
 
-/* 2. 소제목 (Section Title) */
+/* 글로벌 소제목 (Section Title) */
 h2 {
   font-family: var(--heading);
-  font-weight: 600;
-  /* SemiBold (600) */
-  color: var(--text);
-  /* 본문과 동일한 색상 */
+  font-weight: 700;
+  color: var(--text-h);
   font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  margin: 0 0 12px;
 
-  @media (max-width: 1024px) {
+  @media (max-width: 768px) {
     font-size: 20px;
   }
 }
 
-/* 3. 본문 텍스트 */
+h3 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 8px;
+}
+
+/* 본문 텍스트 */
 p {
   margin: 0;
   font-weight: 400;
-  /* Regular (400) */
   color: var(--text);
+  line-height: 1.6;
 }
 
-/* 4. 경고 및 마감 임박 메시지용 공통 클래스 */
+/* 글로벌 컨테이너 공통 클래스 */
+.container-custom {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 640px) {
+  .container-custom {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* 경고 및 마감 임박 메시지용 공통 클래스 */
 .text-warning {
   color: var(--warning);
   font-weight: 600;
-  /* SemiBold (600) */
 }
 
-/* 5. 펀딩 및 핵심 버튼 공통 컴포넌트 클래스 */
+/* 펀딩 및 핵심 버튼 공통 컴포넌트 클래스 */
 .btn-primary {
   background-color: var(--primary-btn);
   color: var(--btn-text);
-  /* #F8FAFC */
-  font-weight: 700;
-  /* Bold (700) */
-  border-radius: 6px;
-  transition: opacity 0.2s ease-in-out;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 /* 코드 스타일 */
@@ -145,8 +158,8 @@ code,
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
+  font-size: 14px;
+  line-height: 140%;
+  padding: 3px 6px;
   background: var(--code-bg);
 }

@@ -39,4 +39,10 @@ public interface HashChainService {
      * @return 무결성 검증 결과 DTO (HashChainVerifyResponseDto)
      */
     HashChainVerifyResponseDto verifyChain();
+
+    /**
+     * 3. 전체 거래 해시 블록 목록 조회
+     */
+    java.util.List<com.fundchain.entity.TransactionLedger> getAllTransactions();
 }
+

@@ -7,13 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // CSS 변수들과 테일윈드 이름을 매핑해 줍니다.
-        funding: 'var(--primary-btn)', // #6366F1
-        warning: 'var(--warning)',     // #FF6584
-        accent: 'var(--accent)',       // #00D4B2
-        tcolor: 'var(--text)',
-        thcolor: 'var(--text)',
-        bg: 'var(--bg)'
+        funding: 'var(--primary-btn)', // #6366F1 (Indigo)
+        warning: 'var(--warning)',     // #FF6584 (Pinkish Red)
+        accent: 'var(--accent)',       // #00D4B2 (Mint)
+        tcolor: 'var(--text)',         // #0F172A (Main Slate)
+        thcolor: 'var(--text-h)',      // #1E293B (Dark Slate)
+        muted: '#64748B',              // Muted slate gray
+        bg: 'var(--bg)',               // #F8FAFC
+        border: 'var(--border)',       // #E2E8F0
+      },
+      maxWidth: {
+        'content': '1200px',
       }
     },
   },

@@ -43,6 +43,15 @@ public class HashChainController {
     }
 
     /**
+     * 전체 거래 해시 블록 목록 조회 API
+     */
+    @Operation(summary = "전체 거래 해시 블록 목록 조회", description = "체인에 등록된 모든 거래 블록 정보를 조회합니다.")
+    @GetMapping
+    public ResponseEntity<java.util.List<com.fundchain.entity.TransactionLedger>> getAllTransactions() {
+        return ResponseEntity.ok(hashChainService.getAllTransactions());
+    }
+
+    /**
      * 전체 거래 내역 해시 무결성 검증 API
      * <p>
      * DB에 기록된 해시 체인의 모든 거래 데이터와 링크가 위변조되지 않았는지 검증합니다.

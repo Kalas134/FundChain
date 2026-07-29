@@ -91,7 +91,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/projects",
-                                "/api/projects/**"
+                                "/api/projects/**",
+                                "/api/transactions",
+                                "/api/transactions/**"
                         ).permitAll()
 
 

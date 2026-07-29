@@ -86,8 +86,8 @@ class MyPageServiceTest {
                 .build();
 
         given(userRepository.findByUserId("user123")).willReturn(Optional.of(user));
-        given(userRepository.existsByNickname("새로운닉네임")).willReturn(false);
-        given(userRepository.existsByPhoneNum("010-9876-5432")).willReturn(false);
+        given(userRepository.existsByPhoneNumAndIsDeletedFalse("010-9876-5432")).willReturn(false);
+        given(userRepository.existsByNicknameAndIsDeletedFalse("...")).willReturn(true);
 
         // when
         MyPageUpdateResponse response = myPageService.updateMyPageInfo("user123", request);

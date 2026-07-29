@@ -111,6 +111,14 @@ public class HashChainServiceImpl implements HashChainService {
     }
 
     /**
+     * 3. 전체 거래 해시 블록 목록 조회
+     */
+    @Override
+    public List<TransactionLedger> getAllTransactions() {
+        return ledgerRepository.findAll();
+    }
+
+    /**
      * SHA-256 해시 계산 유틸리티 메서드
      *
      * @param text 해시화할 대상 문자열

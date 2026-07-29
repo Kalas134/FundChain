@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import profileImg from '../../assets/profile.png';
-import { getMyPageInfo, updateMyPageInfo } from './services/myPageApi';
+import { getMyPageInfo, updateMyPageInfo, deleteMyAccount } from './services/myPageApi';
 
 /**
  * 마이페이지 메인 컴포넌트
@@ -81,6 +81,28 @@ function Mypage(props) {
             const msg = err.response?.data?.message || err.message || "회원정보 수정 중 오류가 발생했습니다.";
             alert(`수정 실패: ${msg}`);
             throw err;
+            }
+    };
+
+    /**
+     * 회원 탈퇴 핸들러 함수
+     */
+    const handleDeleteAccount = async () => {
+        const confirmWithdraw = window.confirm(
+            "정말로 회원 탈퇴하시겠습니까?\n\n- 탈퇴 즉시 로그인 및 서비스 이용이 중단됩니다.\n- 관련 법령에 따라 거래 및 결제 내역은 5년간 보관됩니다.\n- 개인정보는 1년 후 스케줄러를 통해 완전히 파기됩니다."
+        );
+        if (!confirmWithdraw) return;
+
+        try {
+            await deleteMyAccount();
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userRole");
+            alert("회원 탈퇴가 성공적으로 완료되었습니다. 이용해 주셔서 감사합니다.");
+            window.location.href = "/";
+        } catch (err) {
+            console.error("회원 탈퇴 실패:", err);
+            const msg = err.response?.data?.message || err.response?.data || "회원 탈퇴 처리 중 오류가 발생했습니다.";
+            alert(`탈퇴 실패: ${msg}`);
         }
     };
 
@@ -127,6 +149,7 @@ function Mypage(props) {
             <div className="mt-6 flex justify-end">
                 <button
                     type="button"
+                    onClick={handleDeleteAccount}
                     className="px-4 py-2 text-sm font-semibold text-warning bg-white border border-warning/40 rounded-lg hover:bg-warning hover:text-white transition-all duration-200 shadow-sm active:scale-95 cursor-pointer"
                 >
                     회원 탈퇴

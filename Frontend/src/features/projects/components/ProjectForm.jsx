@@ -15,116 +15,58 @@ function ProjectForm({
         contentHtml: ""
     });
 
-    /**
-     * 수정 데이터 반영
-     */
     useEffect(() => {
         if (initialData) {
             setFormData({
-                title:
-                    initialData.title || "",
-                thumbnailImage:
-                    initialData.thumbnailImage || "",
-                targetAmount:
-                    initialData.targetAmount || "",
-                startDate:
-                    formatDateTime(
-                        initialData.startDate
-                    ),
-                endDate:
-                    formatDateTime(
-                        initialData.endDate
-                    ),
-                contentHtml:
-                    removeHtmlTag(
-                        initialData.contentHtml
-                    )
+                title: initialData.title || "",
+                thumbnailImage: initialData.thumbnailImage || "",
+                targetAmount: initialData.targetAmount || "",
+                startDate: formatDateTime(initialData.startDate),
+                endDate: formatDateTime(initialData.endDate),
+                contentHtml: removeHtmlTag(initialData.contentHtml)
             });
         }
     }, [initialData]);
 
-    /**
-     * 날짜 변환
-     *
-     * 2026-08-01T00:00:00Z
-     *
-     * ↓
-     *
-     * 2026-08-01T00:00
-     */
     const formatDateTime = (date) => {
-        if (!date) {
-            return "";
-        }
+        if (!date) return "";
         return date.substring(0, 16);
     };
 
-    /**
-     * HTML 태그 제거
-     *
-     * <p>내용</p>
-     *
-     * ↓
-     *
-     * 내용
-     */
     const removeHtmlTag = (html) => {
-        if (!html) {
-            return "";
-        }
-        return html.replace(
-            /<[^>]*>/g,
-            ""
-        );
+        if (!html) return "";
+        return html.replace(/<[^>]*>/g, "");
     };
 
-    /**
-     * 입력 변경
-     */
     const handleChange = (e) => {
-        const {
-            name,
-            value
-        } = e.target;
+        const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value
         }));
     };
 
-    /**
-     * 제출
-     */
     const handleSubmit = (e) => {
         e.preventDefault();
         if (onSubmit) {
             onSubmit({
                 ...formData,
-                // 백엔드 ISO 변환
-                startDate:
-                    new Date(
-                        formData.startDate
-                    ).toISOString(),
-                endDate:
-                    new Date(
-                        formData.endDate
-                    ).toISOString(),
-                // HTML 저장 형태 유지
-                contentHtml:
-                    `<p>${formData.contentHtml}</p>`
-
+                startDate: new Date(formData.startDate).toISOString(),
+                endDate: new Date(formData.endDate).toISOString(),
+                contentHtml: `<p>${formData.contentHtml}</p>`
             });
         }
     };
 
     return (
         <form
-            className="project-form"
+            className="w-full bg-white rounded-2xl border border-slate-200 p-8 sm:p-10 shadow-sm text-left space-y-6"
             onSubmit={handleSubmit}
         >
-            <div className="project-form-group">
-                <label>
-                    프로젝트 제목
+            {/* 프로젝트 제목 */}
+            <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    프로젝트 제목 <span className="text-rose-500">*</span>
                 </label>
                 <input
                     type="text"
@@ -132,38 +74,48 @@ function ProjectForm({
                     value={formData.title}
                     onChange={handleChange}
                     required
+                    placeholder="프로젝트의 인상적인 제목을 입력하세요"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all"
                 />
             </div>
 
-            <div className="project-form-group">
-                <label>
-                    썸네일 이미지 URL
-                </label>
-                <input
-                    type="text"
-                    name="thumbnailImage"
-                    value={formData.thumbnailImage}
-                    onChange={handleChange}
-                />
+            {/* 썸네일 이미지 & 목표 금액 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        대표 이미지 URL
+                    </label>
+                    <input
+                        type="text"
+                        name="thumbnailImage"
+                        value={formData.thumbnailImage}
+                        onChange={handleChange}
+                        placeholder="https://example.com/image.jpg"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        목표 펀딩 금액 (원) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                        type="number"
+                        name="targetAmount"
+                        value={formData.targetAmount}
+                        onChange={handleChange}
+                        required
+                        placeholder="예: 1000000"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all"
+                    />
+                </div>
             </div>
 
-            <div className="project-form-group">
-                <label>
-                    목표 금액
-                </label>
-                <input
-                    type="number"
-                    name="targetAmount"
-                    value={formData.targetAmount}
-                    onChange={handleChange}
-                    required
-                />
-            </div>
-
-            <div className="project-form-date-group">
-                <div className="project-form-group">
-                    <label>
-                        시작일
+            {/* 시작일 & 종료일 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        펀딩 시작 일시 <span className="text-rose-500">*</span>
                     </label>
                     <input
                         type="datetime-local"
@@ -171,12 +123,13 @@ function ProjectForm({
                         value={formData.startDate}
                         onChange={handleChange}
                         required
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all"
                     />
                 </div>
 
-                <div className="project-form-group">
-                    <label>
-                        종료일
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        펀딩 마감 일시 <span className="text-rose-500">*</span>
                     </label>
                     <input
                         type="datetime-local"
@@ -184,26 +137,31 @@ function ProjectForm({
                         value={formData.endDate}
                         onChange={handleChange}
                         required
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all"
                     />
                 </div>
             </div>
 
-            <div className="project-form-group">
-                <label>
-                    프로젝트 내용
+            {/* 상세 스토리 및 설명 */}
+            <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    프로젝트 상세 설명 <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                     name="contentHtml"
-                    rows="10"
+                    rows="8"
                     value={formData.contentHtml}
                     onChange={handleChange}
                     required
+                    placeholder="프로젝트의 배경, 목적, 리워드 세부 정보 등을 자유롭게 작성해주세요."
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:bg-white focus:border-funding focus:outline-none focus:ring-2 focus:ring-funding/20 transition-all resize-none"
                 />
             </div>
 
+            {/* 제출 버튼 */}
             <button
-                className="project-submit-btn"
                 type="submit"
+                className="w-full mt-4 rounded-xl bg-funding py-3.5 text-base font-bold text-white shadow-md hover:bg-indigo-600 hover:shadow-lg transition-all active:translate-y-0"
             >
                 {submitText}
             </button>
