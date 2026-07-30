@@ -1,6 +1,6 @@
 # 🚀 FundChain - 투명한 해시체인 기반 크라우드 펀딩 플랫폼
 
-> **FundChain**은 블록체인 해시 체이닝(Hash Chain) 기술을 응용하여 크라우드 펀딩 후원 내역의 위·변조를 방지하고, 창작자와 후원자 간의 신뢰성 높은 거래 환경을 제공하는 **React + Spring Boot** 기반 웹 애플리케이션입니다.
+> **FundChain**은 블록체인 해시 체이닝(Hash Chain) 기술을 응용하여 크라우드 펀딩 후원 내역의 위·변조를 방지하고, 창작자와 후원자 간의 신뢰성 높은 거래 환경을 제공하는 **React + Spring Boot + Supabase PostgreSQL** 기반 웹 애플리케이션입니다.
 
 ---
 
@@ -10,6 +10,7 @@
 3. [DB & 프로젝트 간 상호작용 (Data Interaction Flow)](#3-db--프로젝트-간-상호작용-data-interaction-flow)
 4. [ERD (Entity Relationship Diagram)](#4-erd-entity-relationship-diagram)
 5. [핵심 기능 소개](#5-핵심-기능-소개)
+6. [발표 및 열람용 MD 뷰어 추천 가이드](#6-발표-및-열람용-md-뷰어-추천-가이드)
 
 ---
 
@@ -32,8 +33,8 @@
 | :--- | :--- |
 | **Frontend** | React (Vite), JavaScript (ES6+), TailwindCSS, React Router DOM |
 | **Backend** | Java 17, Spring Boot 3.x, Spring Data JPA, Spring Security, JWT |
-| **Database** | PostgreSQL / H2 Database |
-| **Storage & Tools** | Supabase Storage (이미지 업로드), Swagger / OpenAPI, Gradle |
+| **Database** | **Supabase Database (PostgreSQL Cloud DB)** |
+| **Storage & Tools** | **Supabase Storage** (대표 이미지 클라우드 업로드), Swagger / OpenAPI, Gradle |
 
 <br/>
 
@@ -44,11 +45,12 @@ flowchart TD
     subgraph Client["Frontend (React + Vite)"]
         UI["UI Layer (TailwindCSS / Pretendard)"]
         State["Custom Hooks / Router"]
-        SupabaseClient["Supabase SDK"]
+        SupabaseClient["Supabase JS SDK"]
     end
 
-    subgraph External["External Cloud"]
-        S3["Supabase Storage"]
+    subgraph SupabaseCloud["Supabase Cloud Platform"]
+        Storage["Supabase Storage (Project Thumbnails)"]
+        SupaDB[("Supabase Database (PostgreSQL DB)")]
     end
 
     subgraph Server["Backend (Spring Boot)"]
@@ -57,33 +59,31 @@ flowchart TD
         Service["Business Logic Services"]
         Scheduler["Automated Schedulers"]
         HashEngine["SHA-256 Hash Engine"]
-    end
-
-    subgraph Database["Database System"]
-        DB[(PostgreSQL / H2)]
+        JPA["Spring Data JPA (HikariCP)"]
     end
 
     UI --> State
-    State -- REST API --> Security
-    UI -- Image Upload --> SupabaseClient
-    SupabaseClient --> S3
+    State -- REST API (JSON / Bearer JWT) --> Security
+    UI -- 썸네일 이미지 파일 업로드 --> SupabaseClient
+    SupabaseClient --> Storage
     
     Security --> Controller
     Controller --> Service
     Scheduler --> Service
     Service --> HashEngine
-    Service -- Spring Data JPA --> DB
+    Service --> JPA
+    JPA -- JDBC Pooler (SSL Mode) --> SupaDB
 ```
 
 ---
 
 ## 3. DB & 프로젝트 간 상호작용 (Data Interaction Flow)
 
-FundChain의 핵심 비즈니스 로직은 **Spring Boot 백엔드, 데이터베이스(JPA), 그리고 SHA-256 해시 체인** 간의 체계적인 상호작용으로 작동합니다.
+FundChain의 핵심 비즈니스 로직은 **Spring Boot 백엔드, Supabase Database(PostgreSQL), 그리고 SHA-256 해시 체인** 간의 체계적인 상호작용으로 작동합니다.
 
 ### 3.1 💰 후원 및 해시 체인 무결성 장부 상호작용 Flow
 
-후원이 발생하면 단순 DB 저장에 그치지 않고 이전 해시값과 결합하여 **블록체인 형태의 불변 장부**를 생성합니다.
+후원이 발생하면 단순 DB 저장에 그치지 않고 이전 해시값과 결합하여 **블록체인 형태의 불변 장부**를 생성합니다. 백엔드의 Spring Data JPA가 Supabase PostgreSQL DB와 JDBC 커넥션을 통해 데이터를 기록합니다.
 
 ```mermaid
 sequenceDiagram
@@ -92,18 +92,18 @@ sequenceDiagram
     participant API as MyPageController
     participant Service as MyPageService
     participant HashService as HashChainService
-    participant DB as Database PostgreSQL
+    participant DB as Supabase DB (PostgreSQL)
 
     User->>API: POST /api/mypage/support
     API->>Service: supportProject
     
-    Service->>DB: 1. SupportHistory 엔티티 저장
+    Service->>DB: 1. SupportHistory 엔티티 저장 (JDBC)
     
     Service->>HashService: 2. createTransaction
     HashService->>DB: 2-1. 최신 TransactionLedger currentHash 조회
     HashService->>HashService: 2-2. PreviousHash + Data 조합
     HashService->>HashService: 2-3. SHA-256 해시 계산
-    HashService->>DB: 2-4. TransactionLedger 저장 체인 연결
+    HashService->>DB: 2-4. TransactionLedger 저장 (체인 연결)
     
     Service-->>API: 후원 완료 응답
     API-->>User: 성공 알림 및 마이페이지 갱신
@@ -115,53 +115,53 @@ sequenceDiagram
 
 <br/>
 
-### 3.2 📁 프로젝트 등록/수정 및 1:1 본문 분리 상호작용
+### 3.2 📁 프로젝트 등록/수정 및 Storage-DB 이원화 상호작용
 
-대용량 HTML 스토리를 효율적으로 관리하기 위해 `Projects` 기본 정보 테이블과 `ProjectContent` 상세 본문 테이블을 **1:1 외래키(Cascading)** 관계 구조로 상호작용시킵니다.
+파일 스토리지(Supabase Storage)와 관계형 데이터베이스(Supabase DB)를 분리하여 최적의 성능으로 상호작용시킵니다:
+- **이미지 파일**: 프론트엔드에서 **Supabase Storage**로 선 업로드 후 CDN URL 발급
+- **메타 데이터 및 본문**: 백엔드 Spring Boot를 통해 **Supabase PostgreSQL DB**의 `Projects` & `ProjectContent` (1:1 관계)에 저장
 
 ```mermaid
 flowchart LR
-    subgraph Client
+    subgraph Frontend
         Form["ProjectForm Component"]
     end
     
-    subgraph Supabase
-        Storage["Supabase Bucket"]
+    subgraph SupabasePlatform["Supabase Platform"]
+        Storage["Supabase Storage (Bucket)"]
+        SupaDB[("Supabase DB (PostgreSQL)")]
     end
 
-    subgraph SpringBoot
+    subgraph SpringBoot["Spring Boot Backend"]
         ProjectSvc["ProjectService"]
-    end
-
-    subgraph DB
-        TBL_Projects["Projects Table"]
-        TBL_Content["ProjectContent Table"]
+        JPA["Spring Data JPA"]
     end
 
     Form -- 1. 이미지 선 업로드 --> Storage
     Storage -- 2. Public Image URL 반환 --> Form
     Form -- 3. 프로젝트 저장 요청 DTO --> ProjectSvc
-    ProjectSvc -- 4. Save Base Info --> TBL_Projects
-    ProjectSvc -- 5. Save HTML Content FK --> TBL_Content
+    ProjectSvc --> JPA
+    JPA -- 4. Projects 메타 저장 --> SupaDB
+    JPA -- 5. ProjectContent HTML 스토리 저장 (FK) --> SupaDB
 ```
 
 <br/>
 
-### 3.3 ⏰ 자동화 스케줄러(Scheduler)와 DB 상호작용
+### 3.3 ⏰ 자동화 스케줄러(Scheduler)와 Supabase DB 상호작용
 
 1. **`ProjectScheduler`**:
-   - 매 주기마다 `START_DATE` 및 `END_DATE`를 DB 기준 시각과 비교
+   - 매 주기마다 `START_DATE` 및 `END_DATE`를 Supabase DB 기준 시각과 비교
    - `PREPARING` → `ONGOING` (펀딩 시작)
    - `ONGOING` → 목표 금액 달성 시 `SUCCESS` / 미달 시 `FAILED` (펀딩 종료)로 **상태(STATUS) 자동 갱신**
 2. **`UserCleanupScheduler`**:
    - 회원 탈퇴 요청 시 `IS_DELETED = true`, `DELETED_AT = Timestamp`로 **Soft Delete** 처리
-   - 일정 기간이 지난 탈퇴 회원을 DB에서 배치 삭제하여 **개인정보 보호 및 DB 용량 최적화**
+   - 일정 기간이 지난 탈퇴 회원을 Supabase DB에서 배치 삭제하여 **개인정보 보호 및 DB 용량 최적화**
 
 ---
 
 ## 4. ERD (Entity Relationship Diagram)
 
-FundChain 데이터베이스의 주요 엔티티와 관계 명세입니다.
+FundChain Supabase PostgreSQL 데이터베이스의 주요 엔티티와 관계 명세입니다.
 
 ```mermaid
 erDiagram
@@ -231,7 +231,7 @@ erDiagram
 ### 1. 🔐 회원가입 및 JWT 기반 보안 인증
 - 일반 사용자 / 크리에이터 / 관리자 권한 분리 (`USER_ROLE`)
 - SHA-256 패스워드 암호화 및 JWT 토큰 기반 인증 체계
-- 안전한 탈퇴 처리를 위한 Soft Delete 스케줄링
+- Supabase DB 연결 및 안전한 탈퇴 처리를 위한 Soft Delete 스케줄링
 
 ### 2. 🎨 프로젝트 탐색 및 상세 조회
 - 펀딩 진행 상태별 프로젝트 필터링 및 메타 정보 카드
@@ -243,7 +243,7 @@ erDiagram
 
 ### 4. 💸 펀딩 참여 (후원) 시스템
 - 원하는 금액 후원하기 및 마이페이지 실시간 후원 내역 반응
-- 후원 즉시 **SupportHistory** 기록 및 **TransactionLedger** 해시 체이닝 블록 연동
+- 후원 즉시 **SupportHistory** DB 저장 및 **TransactionLedger** 해시 체이닝 블록 연동
 
 ### 5. 🔗 해시 체인 검증 및 투명성 대시보드
 - 모든 거래 내역에 대해 SHA-256 이전 해시 링킹 적용
@@ -251,7 +251,32 @@ erDiagram
 
 ---
 
-### 📬 개발 정보
+## 6. 발표 및 열람용 MD 뷰어 추천 가이드
+
+해당 마크다운 문서에는 **Mermaid 아키텍처 다이어그램 및 ERD**, **Callout 시각화 상자**가 포함되어 있습니다. 아래 뷰어를 통해 열람하시면 가장 뛰어난 디자인과 시각화 결과를 확인하실 수 있습니다.
+
+> [!TIP]
+> ### 1️⃣ GitHub 웹 리포지토리 (강력 추천 ⭐⭐⭐⭐⭐)
+> - **방법**: 리포지토리의 `README.md`를 웹브라우저로 열람
+> - **장점**: 별도 설정 없이 **Mermaid 다이어그램, ERD, Alert 상자, 테이블, 코드 하이라이팅**이 100% 원본 디자인 그대로 가장 깔끔하게 프리뷰됩니다.
+
+> [!TIP]
+> ### 2️⃣ VS Code (Visual Studio Code)
+> - **추천 확장 프로그램**:
+>   - **`Markdown Preview Enhanced`** (설치 후 `Ctrl + K, V` 누름)
+>   - 또는 **`Mermaid Preview`** / **`GitHub Markdown Preview`**
+> - **장점**: 코드 편집과 실시간 프리뷰 다이어그램을 동시에 보며 발표할 때 최적입니다.
+
+> [!TIP]
+> ### 3️⃣ 데스크톱 전문 마크다운 에디터 (Obsidian / Typora / MarkText)
+> - **Obsidian (옵시디언)**: Mermaid 다이어그램을 기본 내장 지원하며 차트와 다이어그램을 고화질로 렌더링합니다.
+> - **Typora**: 깔끔한 문단 구성과 발표 모드 지원으로 시연용으로 적합합니다.
+
+---
+
+### 📬 문의 및 개발 정보
 - **플랫폼**: FundChain
 - **프론트엔드**: React + Vite + TailwindCSS
-- **백엔드**: Spring Boot + Spring Data JPA + H2/PostgreSQL
+- **백엔드**: Spring Boot + Spring Data JPA (HikariCP)
+- **클라우드 데이터베이스**: Supabase Database (PostgreSQL Cloud DB)
+- **스토리지**: Supabase Storage
