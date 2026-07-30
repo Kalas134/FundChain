@@ -33,8 +33,15 @@ function Navigation() {
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
                 </NavLink>
+                <NavLink
+                    to="/lucky-draw"
+                    className="navigation-link"
+                >
+                    🎁 럭키 드로우
+                </NavLink>
             </div>
         </nav>
+
 
     );
 }
