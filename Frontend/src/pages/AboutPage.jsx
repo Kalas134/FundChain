@@ -34,17 +34,17 @@ function AboutPage() {
                 <section className="mt-8 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
 
                     {/* 01 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             01
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             신뢰할 수 있는 펀딩
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             프로젝트 생성부터 후원까지
                             필요한 과정을 체계적으로 관리합니다.
                         </p>
@@ -53,17 +53,17 @@ function AboutPage() {
 
 
                     {/* 02 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             02
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             투명한 거래 기록
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             SHA-256 기반 검증 구조를 통해
                             거래 데이터의 무결성을 관리합니다.
                         </p>
@@ -72,17 +72,17 @@ function AboutPage() {
 
 
                     {/* 03 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             03
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             함께 만드는 프로젝트
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             창작자와 후원자를 연결하여
                             새로운 프로젝트와 아이디어를 지원합니다.
                         </p>

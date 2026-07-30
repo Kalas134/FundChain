@@ -6,18 +6,17 @@ function HomePage() {
         <div className="min-h-[calc(100vh-140px)] w-full bg-bg text-tcolor">
 
             {/* 홈 메인 영역 */}
-            <main className="container-custom flex flex-col items-center pt-12 pb-16 md:pt-16 text-center">
+            <main className="container-custom flex flex-col items-center pt-10 pb-16 md:pt-14 text-center">
 
                 {/* 메인 히어로 섹션 */}
-                <section className="flex w-full max-w-[900px] flex-col items-center py-6">
+                <section className="flex w-full max-w-[900px] flex-col items-center pt-2 pb-6">
 
                     <span className="mb-3 inline-block rounded-full bg-accent/10 px-4 py-1.5 text-xs font-bold tracking-widest text-accent uppercase">
                         FUNDCHAIN
                     </span>
 
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight text-thcolor tracking-tight">
-                        함께 만드는 프로젝트,
-                        <br className="hidden sm:inline" />
+                        <span className="block mb-1.5 sm:mb-2.5">함께 만드는 프로젝트,</span>
                         <span className="text-accent"> 함께 성장하는</span> 크라우드 펀딩
                     </h1>
 
@@ -57,17 +56,17 @@ function HomePage() {
                 <section className="mt-12 grid w-full grid-cols-1 gap-6 md:grid-cols-3">
 
                     {/* 01 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             01
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             신뢰할 수 있는 펀딩
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             프로젝트 생성부터 후원까지
                             전체 과정을 체계적으로 관리합니다.
                         </p>
@@ -76,17 +75,17 @@ function HomePage() {
 
 
                     {/* 02 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             02
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             투명한 거래 기록
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             SHA-256 기반 검증 구조로
                             거래 데이터의 무결성을 관리합니다.
                         </p>
@@ -95,17 +94,17 @@ function HomePage() {
 
 
                     {/* 03 */}
-                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white p-7 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
+                    <article className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white px-7 pt-5 pb-9 text-center shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1">
 
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 font-bold text-accent text-sm mb-3">
                             03
                         </div>
 
-                        <h3 className="text-xl font-bold text-thcolor">
+                        <h3 className="text-xl font-bold text-thcolor mb-2">
                             함께 만드는 프로젝트
                         </h3>
 
-                        <p className="mt-2 text-sm leading-relaxed text-slate-500">
+                        <p className="text-sm leading-relaxed text-slate-500">
                             창작자와 후원자를 연결하여
                             새로운 프로젝트를 만들어갑니다.
                         </p>
