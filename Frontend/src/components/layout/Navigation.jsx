@@ -34,6 +34,12 @@ function Navigation() {
                     </span>
                 </NavLink>
                 <NavLink
+                    to="/proposals"
+                    className="navigation-link"
+                >
+                    프로젝트 제안
+                </NavLink>
+                <NavLink
                     to="/lucky-draw"
                     className="navigation-link"
                 >
