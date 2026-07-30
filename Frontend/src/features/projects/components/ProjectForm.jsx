@@ -135,8 +135,8 @@ function ProjectForm({
             }
         } catch (err) {
             console.error("프로젝트 제출/이미지 업로드 실패:", err);
-            setUploadError(err.message || "프로젝트 저장 및 이미지 업로드 중 오류가 발생했습니다.");
-            alert(err.message || "프로젝트 저장 중 오류가 발생했습니다.");
+            setUploadError("프로젝트 저장 중 오류가 발생했습니다.");
+            throw err;
         } finally {
             setIsUploading(false);
         }

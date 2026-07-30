@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
  * DB 테이블(SupportHistory) 매핑: SUPPORT_ID, PROJECT_ID, USER_ID, AMOUNT, SUPPORTED_AT
  */
 @Entity
-@Table(name = "SupportHistory")
+@Table(name = "support_history")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

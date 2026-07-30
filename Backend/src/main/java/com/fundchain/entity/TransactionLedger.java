@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 각 거래 내역과 무결성 검증을 위한 이전 해시 및 현재 해시(Hash Chain) 정보를 저장하는 데이터베이스 엔티티입니다.
  */
 @Entity
-@Table(name = "TransactionLedger")
+@Table(name = "transaction_ledger")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TransactionLedger {

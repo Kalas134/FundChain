@@ -336,7 +336,7 @@ function TransactionHistoryPage() {
                     <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden text-left border border-gray-200">
                         <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-bold text-base">후원 결제 영수증</h3>
+                                <h3 className="font-bold text-base text-white">후원 결제 영수증</h3>
                                 <p className="text-[11px] text-slate-400 font-mono">결제번호: SUP-{selectedReceipt.supportId}</p>
                             </div>
                             <button

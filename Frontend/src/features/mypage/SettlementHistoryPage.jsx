@@ -314,7 +314,7 @@ function SettlementHistoryPage() {
                     <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden text-left border border-gray-200">
                         <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
                             <div>
-                                <h3 className="font-bold text-base">프로젝트 정산 명세서</h3>
+                                <h3 className="font-bold text-base text-white">프로젝트 정산 명세서</h3>
                                 <p className="text-[11px] text-slate-400 font-mono">정산번호: SETTL-{selectedStatement.settlementId}</p>
                             </div>
                             <button

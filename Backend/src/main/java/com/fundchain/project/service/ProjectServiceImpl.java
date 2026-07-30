@@ -545,9 +545,9 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
 
-        // 1. 자신의 프로젝트 펀딩 금지 검증
-        if (project.getCreator() != null && userId.equals(project.getCreator().getUserId())) {
-            throw new IllegalArgumentException("자신의 프로젝트는 펀딩할 수 없습니다.");
+        // 1. 크리에이터 회원 후원 금지 검증 (자기 프로젝트 및 모든 타인 프로젝트 포함)
+        if ("CREATOR".equalsIgnoreCase(user.getUserRole()) || (project.getCreator() != null && userId.equals(project.getCreator().getUserId()))) {
+            throw new IllegalArgumentException("크리에이터 회원은 후원을 할 수 없습니다.");
         }
 
         // 2. 이미 펀딩한 프로젝트 재펀딩 금지 검증
