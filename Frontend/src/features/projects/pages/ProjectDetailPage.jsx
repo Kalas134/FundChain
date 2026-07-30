@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useProjects from "../hooks/useProjects";
 import "../../../styles/frame.css";
 import { mockCreatorProjects } from "../../mypage/mockData";
-import { supportProject } from "../../mypage/services/myPageApi";
+import { supportProject, getSponsoredProjects } from "../../mypage/services/myPageApi";
 
 function ProjectDetailPage() {
     // ============================================================
@@ -33,6 +33,32 @@ function ProjectDetailPage() {
     const [supportAmount, setSupportAmount] = useState(10000);
     const [showSupportModal, setShowSupportModal] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [hasFunded, setHasFunded] = useState(false);
+
+    const currentUserId = localStorage.getItem("userId");
+
+    useEffect(() => {
+        const checkSponsoredStatus = async () => {
+            if (!currentUserId || !projectId) {
+                setHasFunded(false);
+                return;
+            }
+            try {
+                const sponsoredProjects = await getSponsoredProjects();
+                if (Array.isArray(sponsoredProjects)) {
+                    const funded = sponsoredProjects.some(
+                        (item) => String(item.projectId ?? item.id) === String(projectId)
+                    );
+                    setHasFunded(funded);
+                }
+            } catch (err) {
+                console.error("후원 내역 조회 실패:", err);
+                setHasFunded(false);
+            }
+        };
+
+        checkSponsoredStatus();
+    }, [projectId, currentUserId]);
 
     // ============================================================
     // 4. 프로젝트 상세 조회
@@ -194,10 +220,16 @@ function ProjectDetailPage() {
             className: "status-unknown"
         };
     // ============================================================
-    // 11. 날짜 기준 마감 여부
+    // 11. 날짜 및 크리에이터 / 후원 이력 기준 마감/펀딩 불가 여부
     // ============================================================
     const isEnded =
         today > endDate;
+
+    const isCreator = Boolean(
+        currentUserId &&
+        displayProject?.creatorId &&
+        String(displayProject.creatorId) === String(currentUserId)
+    );
     // ============================================================
     // 12. 후원 처리
     // ============================================================
@@ -325,7 +357,17 @@ function ProjectDetailPage() {
 
                         disabled={
                             displayProject.status !== "ONGOING" ||
-                            isEnded
+                            isEnded ||
+                            isCreator ||
+                            hasFunded
+                        }
+
+                        title={
+                            isCreator
+                                ? "자신의 프로젝트는 펀딩할 수 없습니다"
+                                : hasFunded
+                                    ? "이미 펀딩한 프로젝트 입니다"
+                                    : ""
                         }
 
                         onClick={() =>
@@ -345,7 +387,13 @@ function ProjectDetailPage() {
                                         : isEnded
                                             ? "마감된 프로젝트"
 
-                                            : "펀딩하기"
+                                            : isCreator
+                                                ? "자신의 프로젝트는 펀딩할 수 없습니다"
+
+                                                : hasFunded
+                                                    ? "이미 펀딩한 프로젝트 입니다"
+
+                                                    : "펀딩하기"
                         }
                     </button>
                 </section>

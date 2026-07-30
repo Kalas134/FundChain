@@ -29,6 +29,12 @@ public class MyPageResponse {
     private String email;
     private String bankName;
     private String accountNum;
+    private String profileImage;
+
+    @JsonProperty("imageUrl")
+    public String getImageUrl() {
+        return profileImage != null ? profileImage : "https://kauxitpgpizwqlkecpyo.supabase.co/storage/v1/object/public/profile-image/profile.png";
+    }
 
     public static MyPageResponse from(User user) {
         return MyPageResponse.builder()
@@ -41,6 +47,7 @@ public class MyPageResponse {
                 .email(user.getEmail())
                 .bankName(user.getBankName())
                 .accountNum(user.getAccountNum())
+                .profileImage(user.getProfileImage() != null ? user.getProfileImage() : "https://kauxitpgpizwqlkecpyo.supabase.co/storage/v1/object/public/profile-image/profile.png")
                 .build();
     }
 }

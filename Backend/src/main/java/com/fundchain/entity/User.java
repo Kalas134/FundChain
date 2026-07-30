@@ -123,6 +123,17 @@ public class User {
 
 
     /**
+     * 프로필 이미지 URL
+     */
+    @Column(
+            name = "PROFILE_IMAGE",
+            length = 512
+    )
+    @Builder.Default
+    private String profileImage = "https://kauxitpgpizwqlkecpyo.supabase.co/storage/v1/object/public/profile-image/profile.png";
+
+
+    /**
      * Soft Delete 여부
      *
      * false → 정상 회원
@@ -150,7 +161,8 @@ public class User {
             String nickname,
             String phoneNum,
             String bankName,
-            String accountNum
+            String accountNum,
+            String profileImage
     ) {
 
         if (nickname != null && !nickname.isBlank()) {
@@ -167,6 +179,10 @@ public class User {
 
         if (accountNum != null) {
             this.accountNum = accountNum;
+        }
+
+        if (profileImage != null && !profileImage.isBlank()) {
+            this.profileImage = profileImage;
         }
     }
 
@@ -194,5 +210,6 @@ public class User {
         this.birthDate = null;
         this.bankName = null;
         this.accountNum = null;
+        this.profileImage = "https://kauxitpgpizwqlkecpyo.supabase.co/storage/v1/object/public/profile-image/profile.png";
     }
 }

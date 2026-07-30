@@ -66,7 +66,8 @@ public class MyPageService {
                 request.getNickname(),
                 request.getPhoneNum(),
                 request.getBankName(),
-                request.getAccountNum()
+                request.getAccountNum(),
+                request.getProfileImage()
         );
 
         return MyPageUpdateResponse.from(user);
@@ -100,7 +101,17 @@ public class MyPageService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
 
-        // 1. SupportHistory 저장
+        // 1. 자신의 프로젝트 펀딩 금지 검증
+        if (project.getCreator() != null && userId.equals(project.getCreator().getUserId())) {
+            throw new IllegalArgumentException("자신의 프로젝트는 펀딩할 수 없습니다.");
+        }
+
+        // 2. 이미 펀딩한 프로젝트 재펀딩 금지 검증
+        if (supportHistoryRepository.existsByProject_ProjectIdAndUser_UserId(projectId, userId)) {
+            throw new IllegalArgumentException("이미 펀딩한 프로젝트 입니다.");
+        }
+
+        // 3. SupportHistory 저장
         SupportHistory supportHistory = SupportHistory.builder()
                 .project(project)
                 .user(user)

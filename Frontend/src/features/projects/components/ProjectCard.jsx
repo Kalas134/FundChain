@@ -137,27 +137,7 @@ function ProjectCard({ project }) {
                     {project.description}
                 </p>
 
-                {/* 수정:
-                    기존의
-                    "상태 : 진행중"
-                    텍스트는 제거한다.
-
-                    상태는 썸네일 영역의 상태 배지로 표시한다.
-                */}
-
             </div>
-
-            {/* 펀딩 버튼 */}
-            <button
-                type="button"
-                className="project-card-funding-button"
-                onClick={(e) => {
-                    // 카드 클릭 이벤트가 버튼까지 전달되지 않도록 방지
-                    e.stopPropagation();
-                }}
-            >
-                펀딩하기
-            </button>
         </div>
     );
 }

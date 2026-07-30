@@ -1,95 +1,81 @@
-SELECT current_database();
-
-DROP TABLE IF EXISTS Users;
-
-/* 유저 테이블 */
+-- 1. Users 테이블 (회원 정보)
 CREATE TABLE Users (
-    USER_ID VARCHAR(50) PRIMARY KEY,
-
-    USER_ROLE VARCHAR(20) NOT NULL
-        CHECK (USER_ROLE IN ('USER', 'CREATOR', 'ADMIN')),
-
-    PASSWORD VARCHAR(100) NOT NULL,
-
-    NICKNAME VARCHAR(30) NOT NULL UNIQUE,
-
-    USERNAME VARCHAR(50) NOT NULL,
-
-    BIRTHDATE DATE NOT NULL,
-
-    PHONE_NUM VARCHAR(20) NOT NULL UNIQUE,
-
-    EMAIL VARCHAR(100) NOT NULL UNIQUE,
-
-    BANK_NAME VARCHAR(30),
-
-    ACCOUNT_NUM VARCHAR(25),
-
-    IS_DELETED BOOLEAN NOT NULL DEFAULT FALSE
+                       USER_ID VARCHAR(50) PRIMARY KEY,
+                       USER_ROLE VARCHAR(20) NOT NULL CHECK (USER_ROLE IN ('USER', 'CREATOR', 'ADMIN')),
+                       PASSWORD VARCHAR(100),
+                       NICKNAME VARCHAR(50) UNIQUE,
+                       USERNAME VARCHAR(50),
+                       BIRTHDATE DATE,
+                       PHONE_NUM VARCHAR(20) UNIQUE,
+                       EMAIL VARCHAR(100) UNIQUE,
+                       BANK_NAME VARCHAR(30),
+                       ACCOUNT_NUM VARCHAR(25),
+                       PROFILE_IMAGE VARCHAR(512),
+                       IS_DELETED BOOLEAN NOT NULL DEFAULT FALSE,
+                       DELETED_AT TIMESTAMP WITH TIME ZONE
 );
 
-
-/* 프로젝트 테이블 */
+-- 2. Projects 테이블 (프로젝트 기본 정보)
 CREATE TABLE Projects (
-    PROJECT_ID BIGSERIAL PRIMARY KEY,
+                          PROJECT_ID BIGSERIAL PRIMARY KEY,
 
-    CREATOR_ID VARCHAR(50) NOT NULL,
+                          CREATOR_ID VARCHAR(50) NOT NULL,
 
-    TITLE VARCHAR(255) NOT NULL,
+                          TITLE VARCHAR(255) NOT NULL,
 
-    THUMBNAIL_IMAGE VARCHAR(512),
+                          THUMBNAIL_IMAGE VARCHAR(512),
 
-    TARGET_AMOUNT NUMERIC(15, 2) NOT NULL
-        CHECK (TARGET_AMOUNT > 0),
+                          TARGET_AMOUNT NUMERIC(15, 2) NOT NULL
+                              CHECK (TARGET_AMOUNT > 0),
 
-    START_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
+                          START_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    END_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
+                          END_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    STATUS VARCHAR(20) NOT NULL DEFAULT 'PREPARING'
-        CHECK (STATUS IN ('PREPARING', 'ONGOING', 'SUCCESS', 'FAILED')),
+                          STATUS VARCHAR(20) NOT NULL DEFAULT 'PREPARING'
+                              CHECK (STATUS IN ('PREPARING', 'ONGOING', 'SUCCESS', 'FAILED')),
 
-    CONSTRAINT FK_Projects_Users
-        FOREIGN KEY (CREATOR_ID)
-        REFERENCES Users(USER_ID) ON DELETE RESTRICT,
+                          CONSTRAINT FK_Projects_Users
+                              FOREIGN KEY (CREATOR_ID)
+                                  REFERENCES Users(USER_ID) ON DELETE RESTRICT,
 
-    CONSTRAINT CK_Projects_Date
-        CHECK (END_DATE > START_DATE)
+                          CONSTRAINT CK_Projects_Date
+                              CHECK (END_DATE > START_DATE)
+    -- 날짜 조건 추가(당연한 것이나 혹시나 있을 처리 오류에 대한 방어선 같은 것)
 );
 
-
-/* 프로젝트 상세 내용 테이블*/
+-- 3. ProjectContent 테이블 (프로젝트 상세 설명)
 CREATE TABLE ProjectContent (
-    PROJECT_ID BIGINT PRIMARY KEY,
+                                PROJECT_ID BIGINT PRIMARY KEY,
 
-    CONTENT_HTML TEXT NOT NULL,
+                                CONTENT_HTML TEXT NOT NULL,
 
-    CONSTRAINT FK_ProjectContent_Projects
-        FOREIGN KEY (PROJECT_ID)
-        REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE
+                                CONSTRAINT FK_ProjectContent_Projects
+                                    FOREIGN KEY (PROJECT_ID)
+                                        REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE
 );
 
 -- 4. SupportHistory 테이블 (후원 내역)
 CREATE TABLE SupportHistory (
-    SUPPORT_ID BIGSERIAL PRIMARY KEY,
-    PROJECT_ID BIGINT NOT NULL,
-    USER_ID VARCHAR(50) NOT NULL,
-    AMOUNT NUMERIC(15, 2) NOT NULL CHECK (AMOUNT > 0),
-    SUPPORTED_AT TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FK_SupportHistory_Projects FOREIGN KEY (PROJECT_ID) REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE,
-    CONSTRAINT FK_SupportHistory_Users FOREIGN KEY (USER_ID) REFERENCES Users(USER_ID) ON DELETE RESTRICT
+                                SUPPORT_ID BIGSERIAL PRIMARY KEY,
+                                PROJECT_ID BIGINT NOT NULL,
+                                USER_ID VARCHAR(50) NOT NULL,
+                                AMOUNT NUMERIC(15, 2) NOT NULL CHECK (AMOUNT > 0),
+                                SUPPORTED_AT TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                CONSTRAINT FK_SupportHistory_Projects FOREIGN KEY (PROJECT_ID) REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE,
+                                CONSTRAINT FK_SupportHistory_Users FOREIGN KEY (USER_ID) REFERENCES Users(USER_ID) ON DELETE RESTRICT
 );
 
 -- 5. TransactionLedger 테이블 (해쉬 테이블 관련)
 CREATE TABLE TransactionLedger (
-    LEDGER_ID BIGSERIAL PRIMARY KEY,
-    PROJECT_ID BIGINT NOT NULL,
-    USER_ID VARCHAR(50) NOT NULL,
-    TRANSACTION_TYPE VARCHAR(20) NOT NULL DEFAULT 'SUPPORT' CHECK (TRANSACTION_TYPE IN ('SUPPORT', 'SETTLEMENT', 'REFUND')),
-    AMOUNT NUMERIC(15, 2) NOT NULL CHECK (AMOUNT > 0),
-    PREVIOUS_HASH VARCHAR(64) NOT NULL,
-    CURRENT_HASH VARCHAR(64) NOT NULL,
-     CREATED_AT TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-     CONSTRAINT FK_TransactionLedger_Projects FOREIGN KEY (PROJECT_ID) REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE,
-     CONSTRAINT FK_TransactionLedger_Users FOREIGN KEY (USER_ID) REFERENCES Users(USER_ID) ON DELETE RESTRICT
+                                   LEDGER_ID BIGSERIAL PRIMARY KEY,
+                                   PROJECT_ID BIGINT NOT NULL,
+                                   USER_ID VARCHAR(50) NOT NULL,
+                                   TRANSACTION_TYPE VARCHAR(20) NOT NULL DEFAULT 'SUPPORT' CHECK (TRANSACTION_TYPE IN ('SUPPORT', 'SETTLEMENT', 'REFUND')),
+                                   AMOUNT NUMERIC(15, 2) NOT NULL CHECK (AMOUNT > 0),
+                                   PREVIOUS_HASH VARCHAR(64) NOT NULL,
+                                   CURRENT_HASH VARCHAR(64) NOT NULL,
+                                   CREATED_AT TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   CONSTRAINT FK_TransactionLedger_Projects FOREIGN KEY (PROJECT_ID) REFERENCES Projects(PROJECT_ID) ON DELETE CASCADE,
+                                   CONSTRAINT FK_TransactionLedger_Users FOREIGN KEY (USER_ID) REFERENCES Users(USER_ID) ON DELETE RESTRICT
 );

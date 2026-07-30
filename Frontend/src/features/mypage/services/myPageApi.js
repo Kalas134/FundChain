@@ -37,7 +37,7 @@ export const getMyProjects = async (creatorId) => {
     imageUrl: project.thumbnailImage,
     createdDate: project.startDate,
     title: project.title,
-    description: project.contentHtml || '',
+    description: project.contentHtml ? project.contentHtml.replace(/<[^>]*>/g, '') : '',
     // DB 누적 모금액 매핑
     currentAmount: Number(project.currentAmount || 0),
     targetAmount: Number(project.targetAmount || 0),

@@ -27,7 +27,7 @@ function ProfileMenu(props) {
                 const data = await getMyPageInfo();
                 setUserInfo({
                     ...data,
-                    imageUrl: profileImg,
+                    imageUrl: data.profileImage || data.imageUrl || profileImg,
                 });
                 if (data.userRole) {
                     localStorage.setItem("userRole", data.userRole);
@@ -38,6 +38,15 @@ function ProfileMenu(props) {
         };
 
         fetchUserInfo();
+
+        const handleProfileUpdate = () => {
+            fetchUserInfo();
+        };
+
+        window.addEventListener("userProfileUpdated", handleProfileUpdate);
+        return () => {
+            window.removeEventListener("userProfileUpdated", handleProfileUpdate);
+        };
     }, []);
 
     const toggleDropdown = () => {

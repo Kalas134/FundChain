@@ -82,6 +82,11 @@ public class AuthService {
         }
 
 
+        String defaultProfileImg = "https://kauxitpgpizwqlkecpyo.supabase.co/storage/v1/object/public/profile-image/profile.png";
+        String profileImg = (request.getProfileImage() != null && !request.getProfileImage().isBlank())
+                ? request.getProfileImage()
+                : defaultProfileImg;
+
         User user = User.builder()
                 .userId(request.getUserId())
                 .userRole(request.getUserRole())
@@ -102,6 +107,7 @@ public class AuthService {
                 .email(request.getEmail())
                 .bankName(request.getBankName())
                 .accountNum(request.getAccountNum())
+                .profileImage(profileImg)
 
                 // 신규 가입자는 정상 계정
                 .isDeleted(false)

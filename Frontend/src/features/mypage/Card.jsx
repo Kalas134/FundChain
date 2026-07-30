@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import editIcon from '../../assets/edit.svg';
 import checkIcon from '../../assets/check.svg';
 import closeIcon from '../../assets/close.svg';
+import profileImg from '../../assets/profile.png';
+import { uploadProfileImage } from '../../services/supabaseClient';
 
 /**
- * 프로필 정보를 카드 형태로 보여주고, 수정/저장 기능을 제공하는 컴포넌트
+ * 프로필 정보를 카드 형태로 보여주고, 수정/저장 및 지연 이미지 업로드 기능을 제공하는 컴포넌트
  * @param {Object} props - 컴포넌트 속성
- * @param {Object} props.userInfo - 사용자 프로필 정보 객체 (imageUrl, nickname, username, birthdate, email, phoneNum, bankName, accountNum)
+ * @param {Object} props.userInfo - 사용자 프로필 정보 객체
  * @param {Function} props.onUpdate - 프로필 정보 저장 시 상위 컴포넌트로 변경된 정보를 전달하는 콜백 함수
  */
 function Card({ userInfo, onUpdate }) {
@@ -14,27 +16,45 @@ function Card({ userInfo, onUpdate }) {
     const [isEditing, setIsEditing] = useState(false);
     // 저장 중 상태
     const [isSaving, setIsSaving] = useState(false);
+    // 선택된 이미지 파일 객체 (지연 업로드용)
+    const [selectedFile, setSelectedFile] = useState(null);
+    // 로컬 미리보기 Blob URL
+    const [previewUrl, setPreviewUrl] = useState(null);
     // 수정 취소 또는 완료 전까지 임시로 입력값을 보관하는 상태
     const [tempInfo, setTempInfo] = useState({ ...userInfo });
+
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         setTempInfo({ ...userInfo });
     }, [userInfo]);
 
+    // 컴포넌트 언마운트 또는 미리보기 변경 시 Blob URL 해제
+    useEffect(() => {
+        return () => {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl]);
+
     /**
      * 카드 클릭 시 수정 모드로 전환하는 핸들러
-     * 이미 수정 모드인 경우 재전환을 방지합니다.
      */
     const handleCardClick = () => {
         if (!isEditing && !isSaving) {
             setTempInfo({ ...userInfo });
+            setSelectedFile(null);
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+            }
             setIsEditing(true);
         }
     };
 
     /**
      * 입력 필드(input) 데이터 변경 시 호출되는 이벤트 핸들러
-     * @param {React.ChangeEvent<HTMLInputElement>} e - 입력 변경 이벤트 객체
      */
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -45,18 +65,72 @@ function Card({ userInfo, onUpdate }) {
     };
 
     /**
-     * 수정 완료 버튼 클릭 시 변경사항 저장 핸들러
-     * 이벤트 전파를 중단(e.stopPropagation)하고 상위 컴포넌트의 onUpdate를 호출합니다.
-     * @param {React.MouseEvent<HTMLButtonElement>} e - 클릭 이벤트 객체
+     * 프로필 사진 수정 클릭 시 파일 탐색기 열기
+     */
+    const handleProfileImageClick = (e) => {
+        if (isEditing && !isSaving) {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+        }
+    };
+
+    /**
+     * 파일 선택 시 즉시 업로드하지 않고 로컬 미리보기만 생성 (지연 업로드)
+     */
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // 기존 미리보기 URL 해제
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+
+        const localUrl = URL.createObjectURL(file);
+        setSelectedFile(file);
+        setPreviewUrl(localUrl);
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    /**
+     * 수정 완료 버튼 클릭 시 Supabase Storage 업로드 후 백엔드 DB 저장
      */
     const handleSave = async (e) => {
         e.stopPropagation();
         try {
             setIsSaving(true);
-            await onUpdate(tempInfo);
+
+            let finalProfileImage = tempInfo.profileImage || tempInfo.imageUrl;
+
+            // 선택된 새 파일이 있다면 '저장 완료' 시점에만 Supabase Storage에 업로드
+            if (selectedFile) {
+                const { publicUrl } = await uploadProfileImage(selectedFile);
+                finalProfileImage = publicUrl;
+            }
+
+            const savePayload = {
+                ...tempInfo,
+                profileImage: finalProfileImage,
+            };
+
+            await onUpdate(savePayload);
+
+            // 상태 초기화
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+            }
+            setSelectedFile(null);
             setIsEditing(false);
+
+            // Header의 ProfileMenu 갱신용 Custom Event 발송
+            window.dispatchEvent(new CustomEvent('userProfileUpdated'));
         } catch (err) {
-            // 에러 시 편집 모드 유지
+            console.error("프로필 수정 저장 실패:", err);
+            alert(err.message || "프로필 저장 중 오류가 발생했습니다.");
         } finally {
             setIsSaving(false);
         }
@@ -64,14 +138,22 @@ function Card({ userInfo, onUpdate }) {
 
     /**
      * 수정 취소 버튼 클릭 시 핸들러
-     * 변경 내용을 저장하지 않고 수정 모드를 종료합니다.
-     * @param {React.MouseEvent<HTMLButtonElement>} e - 클릭 이벤트 객체
+     * 업로드가 전혀 실행되지 않았으므로 로컬 상태만 초기화
      */
     const handleCancel = (e) => {
         e.stopPropagation();
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
+        setSelectedFile(null);
         setTempInfo({ ...userInfo });
         setIsEditing(false);
     };
+
+    const displayImage = isEditing
+        ? (previewUrl || tempInfo.profileImage || tempInfo.imageUrl || profileImg)
+        : (userInfo.profileImage || userInfo.imageUrl || profileImg);
 
     const displayName = userInfo.username || userInfo.name || '-';
     const displayBirth = userInfo.birthdate || userInfo.birth || '-';
@@ -84,13 +166,49 @@ function Card({ userInfo, onUpdate }) {
                 }`}
         >
             {/* 프로필 이미지 영역 */}
-            {userInfo.imageUrl && (
+            <div className="relative mx-8 my-4 flex-shrink-0">
                 <img
-                    src={userInfo.imageUrl}
+                    src={displayImage}
                     alt={userInfo.nickname || '프로필'}
-                    className="size-48 flex-shrink-0 rounded-full object-cover shadow-inner mx-8 my-4 select-none"
+                    className="size-48 rounded-full object-cover shadow-inner select-none"
                 />
-            )}
+
+                {/* hidden file input */}
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                />
+
+                {/* 수정 모드 시 이미지 클릭 오버레이 및 Edit 아이콘 */}
+                {isEditing && (
+                    <button
+                        type="button"
+                        onClick={handleProfileImageClick}
+                        disabled={isSaving}
+                        className="absolute inset-0 bg-black/40 hover:bg-black/50 rounded-full flex flex-col items-center justify-center text-white transition-all cursor-pointer group/img"
+                        title="프로필 사진 변경"
+                    >
+                        {isSaving ? (
+                            <div className="flex flex-col items-center gap-1">
+                                <div className="w-8 h-8 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                                <span className="text-xs font-semibold">업로드 & 저장 중...</span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center gap-1 group-hover/img:scale-110 transition-transform">
+                                <img
+                                    src={editIcon}
+                                    alt="edit photo"
+                                    className="w-8 h-8 filter brightness-0 invert"
+                                />
+                                <span className="text-xs font-bold tracking-wider">사진 선택</span>
+                            </div>
+                        )}
+                    </button>
+                )}
+            </div>
 
             {/* 사용자 정보 상세/수정 입력 영역 */}
             <div className="flex-1 mx-8 text-left">
@@ -251,4 +369,4 @@ function Card({ userInfo, onUpdate }) {
     );
 }
 
-export default Card;
+export default Card;

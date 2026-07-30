@@ -45,7 +45,7 @@ class MyPageServiceTest {
                 .accountNum("123-4567-8901-23")
                 .build();
 
-        given(userRepository.findByUserId("user123")).willReturn(Optional.of(user));
+        given(userRepository.findByUserIdAndIsDeletedFalse("user123")).willReturn(Optional.of(user));
 
         // when
         MyPageResponse response = myPageService.getMyPageInfo("user123");
@@ -85,9 +85,9 @@ class MyPageServiceTest {
                 .accountNum("987-654-321098")
                 .build();
 
-        given(userRepository.findByUserId("user123")).willReturn(Optional.of(user));
+        given(userRepository.findByUserIdAndIsDeletedFalse("user123")).willReturn(Optional.of(user));
         given(userRepository.existsByPhoneNumAndIsDeletedFalse("010-9876-5432")).willReturn(false);
-        given(userRepository.existsByNicknameAndIsDeletedFalse("...")).willReturn(true);
+        given(userRepository.existsByNicknameAndIsDeletedFalse("새로운닉네임")).willReturn(false);
 
         // when
         MyPageUpdateResponse response = myPageService.updateMyPageInfo("user123", request);
@@ -114,8 +114,8 @@ class MyPageServiceTest {
                 .nickname("이미있는닉네임")
                 .build();
 
-        given(userRepository.findByUserId("user123")).willReturn(Optional.of(user));
-        given(userRepository.existsByNickname("이미있는닉네임")).willReturn(true);
+        given(userRepository.findByUserIdAndIsDeletedFalse("user123")).willReturn(Optional.of(user));
+        given(userRepository.existsByNicknameAndIsDeletedFalse("이미있는닉네임")).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> myPageService.updateMyPageInfo("user123", request))
