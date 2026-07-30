@@ -45,19 +45,19 @@ flowchart TD
     subgraph Client["Frontend (React + Vite)"]
         UI["UI Layer (TailwindCSS / Pretendard)"]
         State["Custom Hooks / Router"]
-        SupabaseClient["Supabase SDK (Storage Upload)"]
+        SupabaseClient["Supabase SDK"]
     end
 
     subgraph External["External Cloud"]
-        S3["Supabase Storage (Project Thumbnails)"]
+        S3["Supabase Storage"]
     end
 
     subgraph Server["Backend (Spring Boot)"]
         Security["Spring Security & JWT Filter"]
-        Controller["REST Controllers (Project, Auth, MyPage, HashChain)"]
+        Controller["REST Controllers"]
         Service["Business Logic Services"]
-        Scheduler["Automated Schedulers (Project & User Cleanup)"]
-        HashEngine["SHA-256 Hash Chain Engine"]
+        Scheduler["Automated Schedulers"]
+        HashEngine["SHA-256 Hash Engine"]
     end
 
     subgraph Database["Database System"]
@@ -65,8 +65,8 @@ flowchart TD
     end
 
     UI --> State
-    State -- REST API (JSON / Bearer JWT) --> Security
-    UI -- Image File Upload --> SupabaseClient
+    State -- REST API --> Security
+    UI -- Image Upload --> SupabaseClient
     SupabaseClient --> S3
     
     Security --> Controller
@@ -89,25 +89,25 @@ FundChain의 핵심 비즈니스 로직은 **Spring Boot 백엔드, 데이터베
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as 후원자 (Client)
+    actor User as 후원자 Client
     participant API as MyPageController
     participant Service as MyPageService
     participant HashService as HashChainService
-    participant DB as Database (PostgreSQL)
+    participant DB as Database PostgreSQL
 
-    User->>API: POST /api/mypage/support (projectId, amount)
-    API->>Service: supportProject(userId, projectId, amount)
+    User->>API: POST /api/mypage/support
+    API->>Service: supportProject
     
-    Service->>DB: 1. SupportHistory 엔티티 생성 및 저장
+    Service->>DB: 1. SupportHistory 엔티티 저장
     
-    Service->>HashService: 2. createTransaction(projectId, userId, amount, "SUPPORT")
-    HashService->>DB: 2-1. 최신 TransactionLedger의 currentHash 조회 (없으면 Genesis Hash)
-    HashService->>HashService: 2-2. data = PreviousHash + ProjectId + UserId + Type + Amount 조합
-    HashService->>HashService: 2-3. SHA-256 해시 계산 (CurrentHash 생성)
-    HashService->>DB: 2-4. TransactionLedger 저장 (체인 연결)
+    Service->>HashService: 2. createTransaction
+    HashService->>DB: 2-1. 최신 TransactionLedger currentHash 조회
+    HashService->>HashService: 2-2. PreviousHash + Data 조합
+    HashService->>HashService: 2-3. SHA-256 해시 계산
+    HashService->>DB: 2-4. TransactionLedger 저장 체인 연결
     
     Service-->>API: 후원 완료 응답
-    API-->>User: 성공 알림 & 마이페이지 갱신
+    API-->>User: 성공 알림 및 마이페이지 갱신
 ```
 
 > [!IMPORTANT]
@@ -135,15 +135,15 @@ flowchart LR
     end
 
     subgraph DB
-        TBL_Projects["Projects Table\n(기본 정보 & 썸네일 URL)"]
-        TBL_Content["ProjectContent Table\n(HTML 스토리)"]
+        TBL_Projects["Projects Table"]
+        TBL_Content["ProjectContent Table"]
     end
 
     Form -- 1. 이미지 선 업로드 --> Storage
     Storage -- 2. Public Image URL 반환 --> Form
-    Form -- 3. 프로젝트 저장 요청 (DTO) --> ProjectSvc
+    Form -- 3. 프로젝트 저장 요청 DTO --> ProjectSvc
     ProjectSvc -- 4. Save Base Info --> TBL_Projects
-    ProjectSvc -- 5. Save HTML Content (FK: ProjectID) --> TBL_Content
+    ProjectSvc -- 5. Save HTML Content FK --> TBL_Content
 ```
 
 <br/>
@@ -166,50 +166,50 @@ FundChain 데이터베이스의 주요 엔티티와 관계 명세입니다.
 
 ```mermaid
 erDiagram
-    Users ||--o{ Projects : "creates (1:N)"
-    Users ||--o{ SupportHistory : "supports (1:N)"
-    Users ||--o{ TransactionLedger : "records (1:N)"
-    Projects ||--|| ProjectContent : "contains (1:1 CASCADE)"
-    Projects ||--o{ SupportHistory : "receives (1:N)"
-    Projects ||--o{ TransactionLedger : "logs (1:N)"
+    Users ||--o{ Projects : creates
+    Users ||--o{ SupportHistory : supports
+    Users ||--o{ TransactionLedger : records
+    Projects ||--|| ProjectContent : contains
+    Projects ||--o{ SupportHistory : receives
+    Projects ||--o{ TransactionLedger : logs
 
     Users {
         VARCHAR_50 USER_ID PK "사용자 아이디"
-        VARCHAR_20 USER_ROLE "권한 (USER, CREATOR, ADMIN)"
+        VARCHAR_20 USER_ROLE "권한 USER CREATOR ADMIN"
         VARCHAR_100 PASSWORD "암호화 비밀번호"
-        VARCHAR_50 NICKNAME UK "닉네임"
+        VARCHAR_50 NICKNAME "유니크 닉네임"
         VARCHAR_50 USERNAME "실명"
         DATE BIRTHDATE "생년월일"
-        VARCHAR_20 PHONE_NUM UK "전화번호"
-        VARCHAR_100 EMAIL UK "이메일"
+        VARCHAR_20 PHONE_NUM "유니크 전화번호"
+        VARCHAR_100 EMAIL "유니크 이메일"
         VARCHAR_30 BANK_NAME "정산 은행"
         VARCHAR_25 ACCOUNT_NUM "정산 계좌"
         VARCHAR_512 PROFILE_IMAGE "프로필 이미지 URL"
-        BOOLEAN IS_DELETED "탈퇴 여부 (Soft Delete)"
+        BOOLEAN IS_DELETED "탈퇴 여부 Soft Delete"
         TIMESTAMP DELETED_AT "탈퇴 시각"
     }
 
     Projects {
         BIGSERIAL PROJECT_ID PK "프로젝트 식별자"
-        VARCHAR_50 CREATOR_ID FK "개설자 아이디 (Users.USER_ID)"
+        VARCHAR_50 CREATOR_ID FK "개설자 아이디 Users USER_ID"
         VARCHAR_255 TITLE "프로젝트 제목"
         VARCHAR_512 THUMBNAIL_IMAGE "대표 이미지 URL"
-        NUMERIC_15_2 TARGET_AMOUNT "목표 펀딩 금액 (>0)"
+        NUMERIC_15_2 TARGET_AMOUNT "목표 펀딩 금액"
         TIMESTAMP START_DATE "펀딩 시작 일시"
         TIMESTAMP END_DATE "펀딩 마감 일시"
-        VARCHAR_20 STATUS "진행 상태 (PREPARING, ONGOING, SUCCESS, FAILED)"
+        VARCHAR_20 STATUS "진행 상태 PREPARING ONGOING SUCCESS FAILED"
     }
 
     ProjectContent {
-        BIGINT PROJECT_ID PK_FK "프로젝트 식별자 (Projects.PROJECT_ID)"
-        TEXT CONTENT_HTML "상세 설명 스토리 (HTML)"
+        BIGINT PROJECT_ID PK, FK "프로젝트 식별자 Projects PROJECT_ID"
+        TEXT CONTENT_HTML "상세 설명 스토리 HTML"
     }
 
     SupportHistory {
         BIGSERIAL SUPPORT_ID PK "후원 내역 식별자"
         BIGINT PROJECT_ID FK "프로젝트 식별자"
         VARCHAR_50 USER_ID FK "후원자 아이디"
-        NUMERIC_15_2 AMOUNT "후원 금액 (>0)"
+        NUMERIC_15_2 AMOUNT "후원 금액"
         TIMESTAMP SUPPORTED_AT "후원 일시"
     }
 
@@ -217,7 +217,7 @@ erDiagram
         BIGSERIAL LEDGER_ID PK "해시 장부 식별자"
         BIGINT PROJECT_ID FK "프로젝트 식별자"
         VARCHAR_50 USER_ID FK "거래 관련 사용자 아이디"
-        VARCHAR_20 TRANSACTION_TYPE "거래 유형 (SUPPORT, SETTLEMENT, REFUND)"
+        VARCHAR_20 TRANSACTION_TYPE "거래 유형 SUPPORT SETTLEMENT REFUND"
         NUMERIC_15_2 AMOUNT "거래 금액"
         VARCHAR_64 PREVIOUS_HASH "이전 블록 SHA-256 해시"
         VARCHAR_64 CURRENT_HASH "현재 블록 SHA-256 해시"
