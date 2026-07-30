@@ -38,4 +38,9 @@ public interface SupportHistoryRepository extends JpaRepository<SupportHistory, 
      */
     @Query("SELECT COUNT(DISTINCT s.user.userId) FROM SupportHistory s WHERE s.project.projectId = :projectId")
     Long countDistinctBackersByProjectId(@Param("projectId") Long projectId);
+
+    /**
+     * 특정 사용자가 특정 프로젝트에 후원한 적이 있는지 여부 확인
+     */
+    boolean existsByProject_ProjectIdAndUser_UserId(Long projectId, String userId);
 }

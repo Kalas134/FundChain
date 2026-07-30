@@ -1021,6 +1021,8 @@ const CreatorProjectsPage = () => {
                                                 >
                                                     {
                                                         project.description
+                                                            ? project.description.replace(/<[^>]*>/g, '')
+                                                            : ''
                                                     }
                                                 </p>
 

@@ -39,4 +39,6 @@ public class RegisterRequest {
     private String bankName;
 
     private String accountNum;
+
+    private String profileImage;
 }

@@ -17,4 +17,5 @@ public class MyPageUpdateRequest {
     private String phoneNum;
     private String bankName;
     private String accountNum;
+    private String profileImage;
 }

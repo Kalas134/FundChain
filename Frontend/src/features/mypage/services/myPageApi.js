@@ -37,7 +37,7 @@ export const getMyProjects = async (creatorId) => {
     imageUrl: project.thumbnailImage,
     createdDate: project.startDate,
     title: project.title,
-    description: project.contentHtml || '',
+    description: project.contentHtml ? project.contentHtml.replace(/<[^>]*>/g, '') : '',
     // DB 누적 모금액 매핑
     currentAmount: Number(project.currentAmount || 0),
     targetAmount: Number(project.targetAmount || 0),
@@ -71,15 +71,6 @@ export const getTransactionHistory = async () => {
  */
 export const getSettlementHistory = async () => {
   const response = await api.get('/mypage/settlement-history');
-  return response.data;
-};
-
-/**
- * 프로젝트 후원하기 API
- * POST /api/mypage/support/{projectId}
- */
-export const supportProject = async (projectId, amount) => {
-  const response = await api.post(`/mypage/support/${projectId}`, { amount });
   return response.data;
 };
 

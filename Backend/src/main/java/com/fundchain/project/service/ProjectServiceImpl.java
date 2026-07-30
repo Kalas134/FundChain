@@ -3,9 +3,11 @@ package com.fundchain.project.service;
 import com.fundchain.entity.Project;
 import com.fundchain.entity.ProjectContent;
 import com.fundchain.entity.ProjectStatus;
+import com.fundchain.entity.SupportHistory;
 import com.fundchain.entity.TransactionLedger;
 import com.fundchain.entity.User;
 import com.fundchain.hashchain.HashChainService;
+import com.fundchain.mypage.dto.SponsoredProjectResponse;
 import com.fundchain.project.dto.ProjectCreateRequest;
 import com.fundchain.project.dto.ProjectResponse;
 import com.fundchain.project.dto.ProjectUpdateRequest;
@@ -20,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -524,4 +528,94 @@ public class ProjectServiceImpl implements ProjectService {
                 )
                 .build();
     }
-}
+
+    /**
+     * 프로젝트 후원하기
+     */
+    @Override
+    @Transactional
+    public SponsoredProjectResponse supportProject(Long projectId, BigDecimal amount, String userId) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("후원 금액은 0보다 커야 합니다.");
+        }
+
+        User user = userRepository.findByUserIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 탈퇴한 회원입니다."));
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+
+        // 1. 크리에이터 회원 후원 금지 검증 (자기 프로젝트 및 모든 타인 프로젝트 포함)
+        if ("CREATOR".equalsIgnoreCase(user.getUserRole()) || (project.getCreator() != null && userId.equals(project.getCreator().getUserId()))) {
+            throw new IllegalArgumentException("크리에이터 회원은 후원을 할 수 없습니다.");
+        }
+
+        // 2. 이미 펀딩한 프로젝트 재펀딩 금지 검증
+        if (supportHistoryRepository.existsByProject_ProjectIdAndUser_UserId(projectId, userId)) {
+            throw new IllegalArgumentException("이미 펀딩한 프로젝트 입니다.");
+        }
+
+        // 3. SupportHistory 저장
+        SupportHistory supportHistory = SupportHistory.builder()
+                .project(project)
+                .user(user)
+                .amount(amount)
+                .supportedAt(OffsetDateTime.now())
+                .build();
+        supportHistoryRepository.save(supportHistory);
+
+        // 4. TransactionLedger(해시 체인)에 거래 기록
+        hashChainService.createTransaction(projectId, userId, amount.longValue(), "SUPPORT");
+
+        return convertToSponsoredResponse(supportHistory);
+    }
+
+    private SponsoredProjectResponse convertToSponsoredResponse(SupportHistory sh) {
+        Project project = sh.getProject();
+        if (project == null) return null;
+
+        DateTimeFormatter displayFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
+        String statusStr;
+        String deliveryStr;
+
+        if (project.getStatus() != null) {
+            switch (project.getStatus()) {
+                case SUCCESS -> {
+                    statusStr = "success";
+                    deliveryStr = "선물 전달 완료";
+                }
+                case FAILED -> {
+                    statusStr = "canceled";
+                    deliveryStr = "환불 처리 완료";
+                }
+                default -> {
+                    statusStr = "reserved";
+                    deliveryStr = "후원 예약 (진행중)";
+                }
+            }
+        } else {
+            statusStr = "reserved";
+            deliveryStr = "후원 예약 (진행중)";
+        }
+
+        OffsetDateTime supportedAt = sh.getSupportedAt() != null ? sh.getSupportedAt() : OffsetDateTime.now();
+        Long amountVal = sh.getAmount() != null ? sh.getAmount().longValue() : 0L;
+
+        return SponsoredProjectResponse.builder()
+                .id(sh.getSupportId())
+                .projectId(project.getProjectId())
+                .title(project.getTitle() != null ? project.getTitle() : "제목 없음")
+                .description(project.getProjectContent() != null && project.getProjectContent().getContentHtml() != null 
+                        ? project.getProjectContent().getContentHtml() : "")
+                .imageUrl(project.getThumbnailImage())
+                .sponsoredDate(supportedAt.format(displayFormatter))
+                .price(String.format("%,d원", amountVal))
+                .amount(amountVal)
+                .status(statusStr)
+                .deliveryStatus(deliveryStr)
+                .year(supportedAt.getYear())
+                .month(supportedAt.getMonthValue())
+                .build();
+    }
+}

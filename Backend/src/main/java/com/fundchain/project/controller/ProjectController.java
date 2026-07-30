@@ -1,15 +1,19 @@
 package com.fundchain.project.controller;
 
+import com.fundchain.mypage.dto.SponsoredProjectResponse;
+import com.fundchain.mypage.dto.SupportRequest;
 import com.fundchain.project.dto.ProjectCreateRequest;
 import com.fundchain.project.dto.ProjectResponse;
 import com.fundchain.project.dto.ProjectUpdateRequest;
 import com.fundchain.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -165,4 +169,23 @@ public class ProjectController {
                 .noContent()
                 .build();
     }
-}
+
+    /**
+     * 프로젝트 후원 API
+     *
+     * POST /api/projects/{projectId}/support
+     *
+     * 로그인한 사용자의 JWT에서 userId를 가져와 특정 프로젝트에 금액을 후원합니다.
+     */
+    @Operation(summary = "프로젝트 후원하기", description = "특정 프로젝트에 금액을 후원합니다.")
+    @PostMapping("/{projectId}/support")
+    public ResponseEntity<SponsoredProjectResponse> supportProject(
+            @PathVariable Long projectId,
+            @RequestBody SupportRequest request,
+            Authentication authentication
+    ) {
+        String userId = authentication.getName();
+        SponsoredProjectResponse response = projectService.supportProject(projectId, request.getAmount(), userId);
+        return ResponseEntity.ok(response);
+    }
+}

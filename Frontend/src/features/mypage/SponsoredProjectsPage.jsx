@@ -14,6 +14,7 @@ const SponsoredProjectsPage = () => {
     const [selectedTab, setSelectedTab] = useState('전체');
     const [selectedYear, setSelectedYear] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedReceipt, setSelectedReceipt] = useState(null);
 
     const fetchProjects = async () => {
         try {
@@ -241,11 +242,11 @@ const SponsoredProjectsPage = () => {
                                         </button>
                                     )}
                                     <button
-                                        onClick={() => navigate("/transactionhistory")} // 지금 우선 연결부터 해 놓음
-                                        className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
+                                        onClick={() => setSelectedReceipt(project)}
+                                        className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors cursor-pointer">
                                         후원 상세
                                     </button>
-                                    <button className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors">
+                                    <button className="flex-1 py-2.5 border border-gray-200 text-gray-700 rounded text-sm font-semibold text-center hover:bg-gray-50 transition-colors cursor-pointer">
                                         창작자 문의
                                     </button>
                                 </div>
@@ -258,6 +259,93 @@ const SponsoredProjectsPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* 전자 결제 영수증 모달 */}
+            {selectedReceipt && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+                    <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden text-left border border-gray-200">
+                        <div className="bg-slate-900 text-white px-5 py-4 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-bold text-base text-white">후원 결제 영수증</h3>
+                                <p className="text-[11px] text-slate-400 font-mono">
+                                    결제번호: SUP-{selectedReceipt.supportId || selectedReceipt.projectId || selectedReceipt.id || '1001'}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setSelectedReceipt(null)}
+                                className="text-slate-400 hover:text-white text-lg font-bold p-1 cursor-pointer"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-3.5 text-xs text-gray-700 font-sans">
+                            <div className="pb-3 border-b border-gray-100">
+                                <span className="text-gray-400 block mb-0.5">프로젝트명</span>
+                                <p className="font-bold text-sm text-gray-900 leading-snug">{selectedReceipt.title}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-100">
+                                <div>
+                                    <span className="text-gray-400 block mb-0.5">창작자 (수령인)</span>
+                                    <p className="font-semibold text-gray-800">{selectedReceipt.creatorNickname || selectedReceipt.creatorId || '공식 창작자'}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-400 block mb-0.5">후원자 ID</span>
+                                    <p className="font-semibold text-gray-800">{selectedReceipt.userId || localStorage.getItem('userId') || 'user_dongguri'}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3 pb-3 border-b border-gray-100">
+                                <div>
+                                    <span className="text-gray-400 block mb-0.5">결제 일시</span>
+                                    <p className="font-semibold text-gray-800">{selectedReceipt.sponsoredDate || selectedReceipt.supportedAt || '-'}</p>
+                                </div>
+                                <div>
+                                    <span className="text-gray-400 block mb-0.5">결제 상태</span>
+                                    <p className="font-semibold text-slate-900">
+                                        {selectedReceipt.status === 'success' || selectedReceipt.status === 'SUCCESS'
+                                            ? '결제 완료'
+                                            : selectedReceipt.status === 'reserved'
+                                                ? '후원 예약'
+                                                : selectedReceipt.status === 'canceled'
+                                                    ? '후원 무산'
+                                                    : '결제 완료'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-3.5 rounded-xl space-y-1.5 border border-gray-200">
+                                <div className="flex justify-between text-gray-500">
+                                    <span>결제 수단</span>
+                                    <span className="font-medium text-gray-800">{selectedReceipt.bankName || '신한카드'}</span>
+                                </div>
+                                <div className="flex justify-between pt-2 border-t border-gray-200 text-sm">
+                                    <span className="font-bold text-gray-900">최종 결제 금액</span>
+                                    <span className="font-extrabold font-mono text-slate-900 text-base">
+                                        {selectedReceipt.price || (selectedReceipt.amount ? selectedReceipt.amount.toLocaleString() + '원' : '-')}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-3.5 bg-gray-50 border-t border-gray-200 flex justify-end gap-2">
+                            <button
+                                onClick={() => window.print()}
+                                className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-100 cursor-pointer"
+                            >
+                                인쇄
+                            </button>
+                            <button
+                                onClick={() => setSelectedReceipt(null)}
+                                className="px-3.5 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-semibold hover:bg-slate-800 cursor-pointer"
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

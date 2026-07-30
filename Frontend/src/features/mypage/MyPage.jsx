@@ -34,7 +34,8 @@ function Mypage(props) {
             const data = await getMyPageInfo();
             setUserInfo({
                 ...data,
-                imageUrl: profileImg, // 이미지는 고정
+                imageUrl: data.profileImage || data.imageUrl || profileImg,
+                profileImage: data.profileImage || data.imageUrl || profileImg,
             });
         } catch (err) {
             console.error("회원정보 조회 실패:", err);
@@ -65,6 +66,7 @@ function Mypage(props) {
                 phoneNum: updatedInfo.phoneNum || updatedInfo.phone,
                 bankName: updatedInfo.bankName,
                 accountNum: updatedInfo.accountNum,
+                profileImage: updatedInfo.profileImage || updatedInfo.imageUrl,
             };
 
             const updatedData = await updateMyPageInfo(updatePayload);
@@ -72,7 +74,8 @@ function Mypage(props) {
             setUserInfo((prev) => ({
                 ...prev,
                 ...updatedData,
-                imageUrl: profileImg,
+                imageUrl: updatedData.profileImage || updatedData.imageUrl || prev.imageUrl,
+                profileImage: updatedData.profileImage || updatedData.imageUrl || prev.profileImage,
             }));
 
             alert("회원 정보가 성공적으로 수정되었습니다.");

@@ -16,8 +16,12 @@ function ProjectCreatePage() {
             const submitData = {
                 ...formData,
                 targetAmount: Number(formData.targetAmount),
-                startDate: new Date(formData.startDate).toISOString(),
-                endDate: new Date(formData.endDate).toISOString(),
+                startDate: typeof formData.startDate === 'string' && formData.startDate.endsWith('Z')
+                    ? formData.startDate
+                    : new Date(formData.startDate).toISOString(),
+                endDate: typeof formData.endDate === 'string' && formData.endDate.endsWith('Z')
+                    ? formData.endDate
+                    : new Date(formData.endDate).toISOString(),
                 contentHtml: formData.contentHtml.startsWith("<p>")
                     ? formData.contentHtml
                     : `<p>${formData.contentHtml}</p>`
@@ -27,8 +31,8 @@ function ProjectCreatePage() {
             alert("프로젝트가 성공적으로 등록되었습니다.");
             navigate("/projects");
         } catch (e) {
-            console.error(e);
-            alert("프로젝트 등록에 실패했습니다. 입력 정보를 확인해주세요.");
+            console.error("프로젝트 등록 오류 상세:", e);
+            alert("프로젝트 등록에 실패했습니다.");
         }
     };
 

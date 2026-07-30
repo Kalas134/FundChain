@@ -67,3 +67,16 @@ export const deleteProject = async (
         `/projects/${projectId}?userId=${userId}`
     );
 };
+
+// 프로젝트 후원
+
+export const supportProject = async (
+    projectId,
+    amount
+) => {
+    const response = await api.post(
+        `/projects/${projectId}/support`,
+        { amount }
+    );
+    return response.data;
+};

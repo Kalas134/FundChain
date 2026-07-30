@@ -73,6 +73,20 @@ public interface ProjectService {
     );
 
     /**
+     * 프로젝트 후원하기
+     *
+     * @param projectId 프로젝트 ID
+     * @param amount 후원 금액
+     * @param userId 후원자 회원 ID
+     * @return 후원 결과 정보
+     */
+    com.fundchain.mypage.dto.SponsoredProjectResponse supportProject(
+            Long projectId,
+            java.math.BigDecimal amount,
+            String userId
+    );
+
+    /**
      * 프로젝트 상태 배치 업데이트
      * - PREPARING 상태 중 시작일이 도래한 프로젝트 -> ONGOING 전환
      * - ONGOING/PREPARING 상태 중 종료일이 지난 프로젝트 -> 목표 금액 달성 여부에 따라 SUCCESS 또는 FAILED 전환
@@ -80,3 +94,4 @@ public interface ProjectService {
     void processProjectStatusUpdates();
 
 }
+

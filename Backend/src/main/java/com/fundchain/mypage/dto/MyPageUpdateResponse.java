@@ -17,6 +17,12 @@ public class MyPageUpdateResponse {
     private String phoneNum;
     private String bankName;
     private String accountNum;
+    private String profileImage;
+
+    @com.fasterxml.jackson.annotation.JsonProperty("imageUrl")
+    public String getImageUrl() {
+        return profileImage;
+    }
 
     public static MyPageUpdateResponse from(User user) {
         return MyPageUpdateResponse.builder()
@@ -25,6 +31,7 @@ public class MyPageUpdateResponse {
                 .phoneNum(user.getPhoneNum())
                 .bankName(user.getBankName())
                 .accountNum(user.getAccountNum())
+                .profileImage(user.getProfileImage())
                 .build();
     }
 }

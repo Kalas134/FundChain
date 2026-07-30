@@ -30,7 +30,7 @@ const ProjectCard = ({ project }) => {
                     <div className="flex flex-col flex-grow pr-10">
                         <span className="text-xs text-gray-400 mb-1.5">{project.sponsoredDate}</span>
                         <h4 className="text-base font-bold text-gray-900 mb-1.5">{project.title}</h4>
-                        <p className="text-sm text-gray-500 mb-2">{project.description}</p>
+                        <p className="text-sm text-gray-500 mb-2">{project.description ? project.description.replace(/<[^>]*>/g, '') : ''}</p>
                         <span className="text-base font-bold text-gray-900 mb-1.5">{project.price}</span>
                         <span className="text-xs text-gray-500">{project.deliveryStatus}</span>
                     </div>

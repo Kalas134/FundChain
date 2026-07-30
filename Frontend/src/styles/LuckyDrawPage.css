@@ -1,0 +1,59 @@
+/* ============================================================
+   LuckyDrawPage (FundChain 라이트 테마 럭키 드로우 이벤트 스타일)
+============================================================ */
+
+/* Card Frame */
+.card-frame {
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Underlay Result */
+.result-underlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    text-align: center;
+}
+
+/* Canvas Overlay */
+.scratch-canvas {
+    position: absolute;
+    inset: 0;
+    cursor: crosshair;
+    touch-action: none;
+    transition: opacity 0.5s ease;
+}
+
+.scratch-canvas.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.2s ease forwards;
+}
+
+.animate-popIn {
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
