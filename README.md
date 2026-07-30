@@ -10,7 +10,6 @@
 3. [DB & 프로젝트 간 상호작용 (Data Interaction Flow)](#3-db--프로젝트-간-상호작용-data-interaction-flow)
 4. [ERD (Entity Relationship Diagram)](#4-erd-entity-relationship-diagram)
 5. [핵심 기능 소개](#5-핵심-기능-소개)
-6. [발표 및 열람용 MD 뷰어 추천 가이드](#6-발표-및-열람용-md-뷰어-추천-가이드)
 
 ---
 
