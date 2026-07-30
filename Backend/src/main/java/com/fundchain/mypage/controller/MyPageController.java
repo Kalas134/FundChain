@@ -58,21 +58,6 @@ public class MyPageController {
     }
 
     /**
-     * POST /api/mypage/support/{projectId} : 프로젝트 후원 API
-     */
-    @Operation(summary = "프로젝트 후원하기", description = "특정 프로젝트에 금액을 후원합니다.")
-    @PostMapping("/support/{projectId}")
-    public ResponseEntity<SponsoredProjectResponse> supportProject(
-            @PathVariable Long projectId,
-            @RequestBody SupportRequest request,
-            @AuthenticationPrincipal String userId
-    ) {
-        String currentUserId = resolveUserId(userId);
-        SponsoredProjectResponse response = myPageService.supportProject(projectId, request.getAmount(), currentUserId);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
      * GET /api/mypage/sponsored-projects : 후원한 프로젝트 목록 API
      */
     @Operation(summary = "후원한 프로젝트 목록 조회", description = "로그인한 회원의 후원 내역을 조회합니다.")

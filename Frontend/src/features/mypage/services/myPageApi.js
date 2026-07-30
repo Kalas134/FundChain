@@ -75,15 +75,6 @@ export const getSettlementHistory = async () => {
 };
 
 /**
- * 프로젝트 후원하기 API
- * POST /api/mypage/support/{projectId}
- */
-export const supportProject = async (projectId, amount) => {
-  const response = await api.post(`/mypage/support/${projectId}`, { amount });
-  return response.data;
-};
-
-/**
  * 회원 탈퇴 API
  * DELETE /api/mypage/me
  */

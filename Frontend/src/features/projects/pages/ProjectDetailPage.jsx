@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import useProjects from "../hooks/useProjects";
 import "../../../styles/frame.css";
 import { mockCreatorProjects } from "../../mypage/mockData";
-import { supportProject, getSponsoredProjects } from "../../mypage/services/myPageApi";
+import { getSponsoredProjects } from "../../mypage/services/myPageApi";
+import { supportProject } from "../services/projectService";
 
 function ProjectDetailPage() {
     // ============================================================

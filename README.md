@@ -88,12 +88,12 @@ FundChain의 핵심 비즈니스 로직은 **Spring Boot 백엔드, Supabase Dat
 sequenceDiagram
     autonumber
     actor User as 후원자 Client
-    participant API as MyPageController
-    participant Service as MyPageService
+    participant API as ProjectController
+    participant Service as ProjectService
     participant HashService as HashChainService
     participant DB as Supabase DB (PostgreSQL)
 
-    User->>API: POST /api/mypage/support
+    User->>API: POST /api/projects/{projectId}/support
     API->>Service: supportProject
     
     Service->>DB: 1. SupportHistory 엔티티 저장 (JDBC)
@@ -242,6 +242,7 @@ erDiagram
 
 ### 4. 💸 펀딩 참여 (후원) 시스템
 - 원하는 금액 후원하기 및 마이페이지 실시간 후원 내역 반응
+- 프로젝트 상세 페이지에서 `POST /api/projects/{projectId}/support` 호출을 통해 펀딩 참여
 - 후원 즉시 **SupportHistory** DB 저장 및 **TransactionLedger** 해시 체이닝 블록 연동
 
 ### 5. 🔗 해시 체인 검증 및 투명성 대시보드
