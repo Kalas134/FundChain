@@ -252,30 +252,7 @@ erDiagram
 
 ---
 
-## 6. 발표 및 열람용 MD 뷰어 추천 가이드
-
-해당 마크다운 문서에는 **Mermaid 아키텍처 다이어그램 및 ERD**, **Callout 시각화 상자**가 포함되어 있습니다. 아래 뷰어를 통해 열람하시면 가장 뛰어난 디자인과 시각화 결과를 확인하실 수 있습니다.
-
-> [!TIP]
-> ### 1️⃣ GitHub 웹 리포지토리 (강력 추천 ⭐⭐⭐⭐⭐)
-> - **방법**: 리포지토리의 `README.md`를 웹브라우저로 열람
-> - **장점**: 별도 설정 없이 **Mermaid 다이어그램, ERD, Alert 상자, 테이블, 코드 하이라이팅**이 100% 원본 디자인 그대로 가장 깔끔하게 프리뷰됩니다.
-
-> [!TIP]
-> ### 2️⃣ VS Code (Visual Studio Code)
-> - **추천 확장 프로그램**:
->   - **`Markdown Preview Enhanced`** (설치 후 `Ctrl + K, V` 누름)
->   - 또는 **`Mermaid Preview`** / **`GitHub Markdown Preview`**
-> - **장점**: 코드 편집과 실시간 프리뷰 다이어그램을 동시에 보며 발표할 때 최적입니다.
-
-> [!TIP]
-> ### 3️⃣ 데스크톱 전문 마크다운 에디터 (Obsidian / Typora / MarkText)
-> - **Obsidian (옵시디언)**: Mermaid 다이어그램을 기본 내장 지원하며 차트와 다이어그램을 고화질로 렌더링합니다.
-> - **Typora**: 깔끔한 문단 구성과 발표 모드 지원으로 시연용으로 적합합니다.
-
----
-
-### 📬 문의 및 개발 정보
+### 📬 개발 정보
 - **플랫폼**: FundChain
 - **프론트엔드**: React + Vite + TailwindCSS
 - **백엔드**: Spring Boot + Spring Data JPA + H2/PostgreSQL
