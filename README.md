@@ -31,7 +31,7 @@
 | 분류 | 기술 스택 |
 | :--- | :--- |
 | **Frontend** | React (Vite), JavaScript (ES6+), TailwindCSS, React Router DOM |
-| **Backend** | Java 17, Spring Boot 3.x, Spring Data JPA, Spring Security, JWT |
+| **Backend** | Java 17, Spring Boot 4.1, Spring Data JPA, Spring Security, JWT |
 | **Database** | **Supabase Database (PostgreSQL Cloud DB)** |
 | **Storage & Tools** | **Supabase Storage** (대표 이미지 클라우드 업로드), Swagger / OpenAPI, Gradle |
 
