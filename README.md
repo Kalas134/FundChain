@@ -1,6 +1,6 @@
 # 🚀 FundChain - 투명한 해시체인 기반 크라우드 펀딩 플랫폼
 
-> **FundChain**은 블록체인 해시 체이닝(Hash Chain) 기술을 응용하여 크라우드 펀딩 후원 내역의 위·변조를 방지하고, 창작자와 후원자 간의 신뢰성 높은 거래 환경을 제공하는 **React + Spring Boot + Supabase PostgreSQL** 기반 웹 애플리케이션입니다.
+> **FundChain**은 해시 체이닝(Hash Chain) 기술을 응용하여 크라우드 펀딩 후원 내역의 위·변조를 방지하고, 창작자와 후원자 간의 신뢰성 높은 거래 환경을 제공하는 **React + Spring Boot + Supabase PostgreSQL** 기반 웹 애플리케이션입니다.
 
 ---
 
